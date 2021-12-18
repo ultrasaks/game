@@ -1,2 +1,2 @@
-# game
+# Platformer
 test
