@@ -2,93 +2,14 @@ import pygame
 import os
 import sys
 import random
+from load_image import load_image
+from player import Player
+from enemy import Enemy
+from constants import *
 
-FPS = 60
-SCREEN_SIZE = 800, 600
-GRAVITY = 0.75
+
 moving_left = False
 moving_right = False
-
-
-def load_image(name):
-    fullname = os.path.join('sprites', name)
-    if not os.path.isfile(fullname):
-        print(f"'{fullname}' not found!")
-        sys.exit()
-    image = pygame.image.load(fullname)
-    return image
-
-
-class Player(pygame.sprite.Sprite):
-    images = load_image("test_sprite.png")
-
-    def __init__(self, *group):
-        super().__init__(*group)
-        self.speed = 5
-        self.vel_y = 0
-        self.image = Player.images
-        self.rect = self.image.get_rect()
-        self.jump = False
-        self.in_air = True
-        self.flip = False
-        self.alive = True
-        self.defence = 0  # потом
-        self.damage = 0  # потом
-        self.hp = 100  # потом
-
-    def move(self, moving_left, moving_right):
-        dx = 0
-        dy = 0
-
-        if moving_left:
-            dx = -self.speed
-            if player.in_air:
-                dx -= 1
-            self.flip = True
-            self.direction = -1
-        if moving_right:
-            dx = self.speed
-            if player.in_air:
-                dx += 1
-            self.flip = False
-            self.direction = 1
-
-        if self.jump and not self.in_air:
-            self.vel_y = -11
-            self.jump = False
-            self.in_air = True
-
-        self.vel_y += GRAVITY
-        dy += self.vel_y
-
-        if self.rect.bottom + dy > 300:
-            dy = 300 - self.rect.bottom
-            self.in_air = False
-
-        self.rect.x += dx
-        self.rect.y += dy
-
-    def draw(self):
-        screen.blit(pygame.transform.flip(self.image, self.flip, False), self.rect)
-
-
-class Enemy(pygame.sprite.Sprite):
-    img = load_image('wtf.png')
-
-    def __init__(self, x, y):
-        super().__init__()
-        self.image = self.img
-        self.rect = self.image.get_rect()
-        self.rect.x, self.rect.y = x, y
-        self.hp = 100
-        self.defence = 0  # потом
-        self.damage = 0  # потом
-
-    def kick(self):
-        self.hp -= random.randint(20, 40)
-        print(f'HIT! HP={self.hp}')
-        if self.hp <= 0:
-            self.kill()
 
 
 def draw_bg():
@@ -125,7 +46,7 @@ if __name__ == '__main__':
 
     while running:
         draw_bg()
-        player.draw()
+        player.draw(screen)
         kicks.draw(screen)
         enemies.draw(screen)
 
