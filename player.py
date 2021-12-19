@@ -17,6 +17,7 @@ class Player(pygame.sprite.Sprite):
         self.in_air = True
         self.flip = False
         self.alive = True
+        self.doubleJ = False
         self.defence = 0  # потом
         self.damage = 0  # потом
         self.hp = 100  # потом
@@ -41,6 +42,12 @@ class Player(pygame.sprite.Sprite):
         if self.jump and not self.in_air:
             self.vel_y = -11
             self.jump = False
+            self.doubleJ = True
+            self.in_air = True
+        elif self.jump and self.doubleJ:
+            self.vel_y = -9
+            self.jump = False
+            self.doubleJ = False
             self.in_air = True
 
         self.vel_y += GRAVITY

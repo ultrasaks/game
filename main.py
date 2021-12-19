@@ -66,7 +66,7 @@ if __name__ == '__main__':
                         moving_left = True
                     if event.key == pygame.K_d:
                         moving_right = True
-                    if event.key == pygame.K_w and player.alive and not player.in_air:
+                    if event.key == pygame.K_w and player.alive and (not player.in_air or player.doubleJ):
                         player.jump = True
                     if event.key == pygame.K_ESCAPE:
                         run = False
