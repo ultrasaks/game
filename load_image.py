@@ -2,7 +2,7 @@ import os
 import sys
 import pygame
 
-
+pygame.init()
 def load_image(name):
     fullname = os.path.join('sprites', name)
     if not os.path.isfile(fullname):
