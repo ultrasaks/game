@@ -7,12 +7,13 @@ import random
 class Player(pygame.sprite.Sprite):
     img = load_image("test_sprite.png")
 
-    def __init__(self, *group):
+    def __init__(self, x, y, speed=5, *group):
         super().__init__(*group)
-        self.speed = 5
+        self.speed = speed
         self.vel_y = 0
         self.image = self.img
         self.rect = self.image.get_rect()
+        self.rect.x, self.rect.y = x, y
         self.jump = False
         self.in_air = True
         self.flip = False
@@ -21,8 +22,10 @@ class Player(pygame.sprite.Sprite):
         self.defence = 0  # потом
         self.damage = 0  # потом
         self.hp = 100  # потом
+        self.width = self.image.get_width()
+        self.height = self.image.get_height()
 
-    def move(self, moving_left, moving_right):
+    def move(self, moving_left, moving_right, world):
         dx = 0
         dy = 0
 
@@ -53,10 +56,21 @@ class Player(pygame.sprite.Sprite):
         self.vel_y += GRAVITY
         dy += self.vel_y
 
-        if self.rect.bottom + dy > 300:
-            dy = 300 - self.rect.bottom
-            self.in_air = False
-
+        for tile in world.obstacle_list:
+            # check collision in the x direction
+            if tile[1].colliderect(self.rect.x + dx, self.rect.y, self.width, self.height):
+                dx = 0
+            # check for collision in the y direction
+            if tile[1].colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
+                # check if below the ground, i.e. jumping
+                if self.vel_y < 0:
+                    self.vel_y = 0
+                    dy = tile[1].bottom - self.rect.top
+                # check if above the ground, i.e. falling
+                elif self.vel_y >= 0:
+                    self.vel_y = 0
+                    self.in_air = False
+                    dy = tile[1].top - self.rect.bottom
         self.rect.x += dx
         self.rect.y += dy
 

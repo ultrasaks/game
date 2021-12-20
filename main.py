@@ -2,19 +2,70 @@ import pygame
 import os
 import sys
 import random
+import csv
 from load_image import load_image
 from player import Player
 from enemy import Enemy
 from constants import *
 
-
 moving_left = False
 moving_right = False
 
 
+img_list = []
+for x in range(21):
+    img = load_image(f'tiles/{x}.png')
+    img = pygame.transform.scale(img, (TILE_SIZE, TILE_SIZE))
+    img_list.append(img)
+
+
+class World():
+    def __init__(self):
+        self.obstacle_list = []
+
+    def process_data(self, data):
+        for y, row in enumerate(data):
+            for x, tile in enumerate(row):
+                if tile >= 0:
+                    img = img_list[tile]
+                    img_rect = img.get_rect()
+                    img_rect.x = x * TILE_SIZE
+                    img_rect.y = y * TILE_SIZE
+                    tile_data = (img, img_rect)
+                    if 0 <= tile <= 8:
+                        self.obstacle_list.append(tile_data)
+                    elif 11 <= tile <= 14:
+                        decoration = Decoration(img, x * TILE_SIZE, y * TILE_SIZE)
+                        decoration_group.add(decoration)
+                    elif tile == 15:
+                        player = Player(x * 38, y * 38, 5)
+                        pass
+                    elif tile == 16:
+                        # enemy = Soldier('enemy', x * TILE_SIZE, y * TILE_SIZE, 1.65, 2, 20, 0)
+                        # enemy_group.add(enemy)
+                        pass
+                    elif tile == 20:
+                        # exit = Exit(img, x * TILE_SIZE, y * TILE_SIZE)
+                        # exit_group.add(exit)
+                        pass
+
+        return player
+
+    def draw(self):
+        for tile in self.obstacle_list:
+            screen.blit(tile[0], tile[1])
+
+
+class Decoration(pygame.sprite.Sprite):
+    def __init__(self, img, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = img
+        self.rect = self.image.get_rect()
+        self.rect.midtop = (x + TILE_SIZE // 2, y + (TILE_SIZE - self.image.get_height()))
+
+
 def draw_bg():
     screen.fill((0, 0, 0))
-    pygame.draw.line(screen, (255, 0, 0), (0, 300), (SCREEN_SIZE[0], 300))
 
 
 def kick():
@@ -41,11 +92,24 @@ if __name__ == '__main__':
         enemies.add(enem)
 
     running = True
-    player = Player()
     kicks = pygame.sprite.Group()
+    decoration_group = pygame.sprite.Group()
+
+    world_data = []
+    for row in range(16):
+        r = [-1] * 150
+        world_data.append(r)
+    with open(f'levels/level1_data.csv', newline='') as csvfile:
+        reader = csv.reader(csvfile, delimiter=',')
+        for x, row in enumerate(reader):
+            for y, tile in enumerate(row):
+                world_data[x][y] = int(tile)
+    world = World()
+    player = world.process_data(world_data)
 
     while running:
         draw_bg()
+        world.draw()
         player.draw(screen)
         kicks.draw(screen)
         enemies.draw(screen)
@@ -56,7 +120,7 @@ if __name__ == '__main__':
         kicks.empty()
 
         if player.alive:
-            player.move(moving_left, moving_right)
+            player.move(moving_left, moving_right, world)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -66,7 +130,8 @@ if __name__ == '__main__':
                         moving_left = True
                     if event.key == pygame.K_d:
                         moving_right = True
-                    if event.key == pygame.K_w and player.alive and (not player.in_air or player.doubleJ):
+                    if event.key == pygame.K_w and player.alive and (
+                            not player.in_air or player.doubleJ):
                         player.jump = True
                     if event.key == pygame.K_ESCAPE:
                         run = False
