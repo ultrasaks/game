@@ -24,6 +24,7 @@ class World():
         self.obstacle_list = []
 
     def process_data(self, data):
+        global player
         for y, row in enumerate(data):
             for x, tile in enumerate(row):
                 if tile >= 0:
@@ -65,7 +66,7 @@ class Decoration(pygame.sprite.Sprite):
 
 
 def draw_bg():
-    screen.fill((0, 0, 0))
+    screen.fill((105, 193, 231))
 
 
 def kick():
@@ -77,7 +78,8 @@ def kick():
     else:
         kickpos = 32
     kickTest.rect.x, kickTest.rect.y = player.rect.x + kickpos, player.rect.y
-    kicks.add(kickTest)
+    # kicks.add(kickTest)
+    player.isKick = 7
 
 
 if __name__ == '__main__':
@@ -87,9 +89,9 @@ if __name__ == '__main__':
     screen = pygame.display.set_mode(SCREEN_SIZE)
 
     enemies = pygame.sprite.Group()
-    for _ in range(10):
-        enem = Enemy(random.randint(0, SCREEN_SIZE[0]), random.randint(100, 300))
-        enemies.add(enem)
+    # for _ in range(10):
+    #     enem = Enemy(random.randint(0, SCREEN_SIZE[0]), random.randint(100, 300))
+    #     enemies.add(enem)
 
     running = True
     kicks = pygame.sprite.Group()
