@@ -3,10 +3,12 @@ import os
 import sys
 import random
 import csv
+from pygame.locals import *
 from load_image import load_image
 from player import Player
 from enemy import Enemy
 from constants import *
+from slime import Slime
 
 moving_left = False
 moving_right = False
@@ -27,6 +29,7 @@ class World():
         for y, row in enumerate(data):
             for x, tile in enumerate(row):
                 if tile >= 0:
+
                     img = img_list[tile]
                     img_rect = img.get_rect()
                     img_rect.x = x * TILE_SIZE
@@ -35,10 +38,12 @@ class World():
                     if 0 <= tile <= 8:
                         self.obstacle_list.append(tile_data)
                     elif 11 <= tile <= 14:
-                        decoration = Decoration(img, x * TILE_SIZE, y * TILE_SIZE)
+                        decoration = Decoration(
+                            img, x * TILE_SIZE, y * TILE_SIZE)
                         decoration_group.add(decoration)
                     elif tile == 15:
                         player = Player(x * 38, y * 38, 5)
+                        slime = Slime(x * 38, y * 38, 2)
                         pass
                     elif tile == 16:
                         # enemy = Soldier('enemy', x * TILE_SIZE, y * TILE_SIZE, 1.65, 2, 20, 0)
@@ -49,7 +54,7 @@ class World():
                         # exit_group.add(exit)
                         pass
 
-        return player
+        return player, slime
 
     def draw(self):
         for tile in self.obstacle_list:
@@ -61,11 +66,12 @@ class Decoration(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.image = img
         self.rect = self.image.get_rect()
-        self.rect.midtop = (x + TILE_SIZE // 2, y + (TILE_SIZE - self.image.get_height()))
+        self.rect.midtop = (x + TILE_SIZE // 2, y +
+                            (TILE_SIZE - self.image.get_height()))
 
 
 def draw_bg():
-    screen.fill((0, 0, 0))
+    screen.fill((0, 0, 240))
 
 
 def kick():
@@ -88,11 +94,18 @@ if __name__ == '__main__':
 
     enemies = pygame.sprite.Group()
     for _ in range(10):
-        enem = Enemy(random.randint(0, SCREEN_SIZE[0]), random.randint(100, 300))
+        enem = Enemy(random.randint(
+            0, SCREEN_SIZE[0]), random.randint(100, 300))
         enemies.add(enem)
+
+    slimes = pygame.sprite.Group()
+    # for _ in range(10):
+    #     enem = Enemy(random.randint(0, SCREEN_SIZE[0]), random.randint(100, 300))
+    #     enemies.add(enem)
 
     running = True
     kicks = pygame.sprite.Group()
+    players = pygame.sprite.Group()
     decoration_group = pygame.sprite.Group()
 
     world_data = []
@@ -105,42 +118,51 @@ if __name__ == '__main__':
             for y, tile in enumerate(row):
                 world_data[x][y] = int(tile)
     world = World()
-    player = world.process_data(world_data)
+    player, slime = world.process_data(world_data)
+    slimes.add(slime)
+    players.add(player)
 
     while running:
         draw_bg()
         world.draw()
         player.draw(screen)
-        kicks.draw(screen)
-        enemies.draw(screen)
+        slime.draw(screen)
+        slimes.draw(screen)
 
-        for enemy in enemies:
+        for enemy in slimes:
             if pygame.sprite.spritecollide(enemy, kicks, False):
-                enemy.kick()
+                pass
+
+            if pygame.sprite.spritecollide(enemy, players, False):
+                player.kick(slime)
         kicks.empty()
 
         if player.alive:
             player.move(moving_left, moving_right, world)
+
+        if slime.alive:
+            slime.move(player, world)
+
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+            if event.type == QUIT:
                 running = False
-            if event.type == pygame.KEYDOWN:
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_a:
+            if event.type == KEYDOWN:
+                if event.type == KEYDOWN:
+                    if event.key in [K_a]:
                         moving_left = True
-                    if event.key == pygame.K_d:
+                    if event.key in [K_d]:
                         moving_right = True
-                    if event.key == pygame.K_w and player.alive and (
+                    if event.key in [K_w] and player.alive and (
                             not player.in_air or player.doubleJ):
                         player.jump = True
-                    if event.key == pygame.K_ESCAPE:
+                    if event.key in [K_ESCAPE]:
                         run = False
-                    if event.key == pygame.K_SPACE:
+                    if event.key in [K_SPACE]:
                         kick()
-            if event.type == pygame.KEYUP:
-                if event.key == pygame.K_a:
+            if event.type == KEYUP:
+                if event.key in [K_a]:
                     moving_left = False
-                if event.key == pygame.K_d:
+                if event.key in [K_d]:
                     moving_right = False
         clock.tick(FPS)
         pygame.display.flip()
