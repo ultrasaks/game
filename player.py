@@ -5,13 +5,18 @@ import random
 
 
 class Player(pygame.sprite.Sprite):
-    img = load_image("test_sprite.png")
+    baseSprite = load_image("test_sprite.png")
+    runSprite = load_image('test_sprite_step.png')
+    runSprite2 = load_image('test_sprite_step2.png')
+    jumpSprite = load_image('test_sprite_jump.png')
+    fallSprite = load_image('test_sprite_fall.png')
+    kickSprite = load_image('test_sprite_kick.png')
 
     def __init__(self, x, y, speed=5, *group):
         super().__init__(*group)
         self.speed = speed
         self.vel_y = 0
-        self.image = self.img
+        self.image = self.baseSprite
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = x, y
         self.jump = False
@@ -24,8 +29,12 @@ class Player(pygame.sprite.Sprite):
         self.hp = 100  # потом
         self.width = self.image.get_width()
         self.height = self.image.get_height()
+        self.spriteN = 0
+        self.spriteRun = False
+        self.isKick = 0
 
     def move(self, moving_left, moving_right, world):
+        # движение за этот ход
         dx = 0
         dy = 0
 
@@ -42,12 +51,27 @@ class Player(pygame.sprite.Sprite):
             self.flip = False
             self.direction = 1
 
-        if self.jump and not self.in_air:
+        if moving_left or moving_right:  # спрайты во время бега
+            self.spriteN += 1
+            if self.spriteN >= 6:  # за сколько кадров сменяется спрайт
+                self.spriteN = 0
+                if self.spriteRun:
+                    self.spriteRun = False
+                else:
+                    self.spriteRun = True
+            if self.spriteRun:
+                self.image = self.runSprite
+            else:
+                self.image = self.runSprite2
+        else:
+            self.image = self.baseSprite
+
+        if self.jump and not self.in_air:  # прыжок
             self.vel_y = -11
             self.jump = False
             self.doubleJ = True
             self.in_air = True
-        elif self.jump and self.doubleJ:
+        elif self.jump and self.doubleJ:  # двойной прыжок
             self.vel_y = -9
             self.jump = False
             self.doubleJ = False
@@ -71,6 +95,18 @@ class Player(pygame.sprite.Sprite):
                     self.vel_y = 0
                     self.in_air = False
                     dy = tile[1].top - self.rect.bottom
+
+        if dy > GRAVITY:
+            # падение
+            self.image = self.fallSprite
+        elif dy < 0:
+            # прыжок
+            self.image = self.jumpSprite
+
+        if self.isKick > 0:
+            self.image = self.kickSprite
+            self.isKick -= 1
+
         self.rect.x += dx
         self.rect.y += dy
 
