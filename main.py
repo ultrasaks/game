@@ -1,5 +1,4 @@
 import pygame
-from pygame.locals import *
 import os
 import sys
 import random
@@ -123,25 +122,25 @@ if __name__ == '__main__':
         if player.alive:
             player.move(moving_left, moving_right, world)
         for event in pygame.event.get():
-            if event.type == QUIT:
+            if event.type == pygame.QUIT:
                 running = False
-            if event.type == KEYDOWN:
-                if event.type == KEYDOWN:
+            if event.type == pygame.KEYDOWN:
+                if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_a:
                         moving_left = True
                     if event.key == pygame.K_d:
                         moving_right = True
-                    if event.key == K_w and player.alive and (
+                    if event.key == pygame.K_w and player.alive and (
                             not player.in_air or player.doubleJ):
                         player.jump = True
-                    if event.key == K_ESCAPE:
+                    if event.key == pygame.K_ESCAPE:
                         run = False
-                    if event.key == K_SPACE:
+                    if event.key == pygame.K_SPACE:
                         kick()
-            if event.type == KEYUP:
-                if event.key == K_a:
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_a:
                     moving_left = False
-                if event.key == K_d:
+                if event.key == pygame.K_d:
                     moving_right = False
         clock.tick(FPS)
         pygame.display.flip()
