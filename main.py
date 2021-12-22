@@ -127,21 +127,21 @@ if __name__ == '__main__':
                 running = False
             if event.type == KEYDOWN:
                 if event.type == KEYDOWN:
-                    if event.key in [K_a, K_LEFT]:
+                    if event.key == pygame.K_a:
                         moving_left = True
-                    if event.key in [K_d, K_RIGHT]:
+                    if event.key == pygame.K_d:
                         moving_right = True
-                    if event.key in [K_w, K_UP] and player.alive and (
+                    if event.key == K_w and player.alive and (
                             not player.in_air or player.doubleJ):
                         player.jump = True
-                    if event.key in [K_SPACE]:
+                    if event.key == K_ESCAPE:
                         run = False
-                    if event.key in [K_SPACE]:
+                    if event.key == K_SPACE:
                         kick()
             if event.type == KEYUP:
-                if event.key in [K_a, K_LEFT]:
+                if event.key == K_a:
                     moving_left = False
-                if event.key in [K_d, K_RIGHT]:
+                if event.key == K_d:
                     moving_right = False
         clock.tick(FPS)
         pygame.display.flip()

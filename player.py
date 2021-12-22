@@ -3,7 +3,6 @@ import pygame
 from constants import *
 import random
 
-pygame.init()
 
 class Player(pygame.sprite.Sprite):
     img = load_image("test_sprite.png")

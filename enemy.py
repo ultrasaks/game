@@ -2,7 +2,6 @@ import pygame
 from load_image import load_image
 import random
 
-pygame.init()
 
 class Enemy(pygame.sprite.Sprite):
     img = load_image('wtf.png')
