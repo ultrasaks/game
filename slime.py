@@ -1,0 +1,90 @@
+# initialized libs
+
+import sys
+import os
+import pygame
+import slime as slime
+from pygame.locals import *
+from constants import *
+from load_image import load_image
+import random
+
+# slime
+
+
+class Slime(pygame.sprite.Sprite):
+    img_slime_jump = pygame.transform.scale(
+        load_image("enemy/slime/jump.png"), (30, 30))
+    img_slime_down_air = pygame.transform.scale(
+        load_image("enemy/slime/down.png"), (30, 30))
+    img_slime_down = pygame.transform.scale(
+        load_image("enemy/slime/down_up.png"), (30, 30))
+
+    def __init__(self, x, y, speed=5, *group):
+        super().__init__(*group)
+        self.speed = speed
+        self.vel_y = 0
+        self.image = Slime.img_slime_down
+        self.rect = self.image.get_rect()
+        self.rect.x, self.rect.y = x, y
+        self.jump = False
+        self.in_air = False
+        self.flip = False
+        self.alive = True
+        self.hp = 100
+        self.damage = 25
+        self.width = self.image.get_width()
+        self.height = self.image.get_height()
+        # зона поиска игрока
+        self.x2, self.y2 = (400, 100)
+
+    def move(self, player, world):
+        dx = 0
+        dy = 0
+        # корды которые определяют радиус
+        x, y = self.rect.center
+
+        if player.rect.x + 5 < self.rect.x and (x - self.x2, y - self.y2) < player.rect.center < (x + self.x2, y + self.y2):
+            if self.in_air:
+                dx = -self.speed
+        elif player.rect.x - 5 > self.rect.x and (x - self.x2, y - self.y2) < player.rect.center < (x + self.x2, y + self.y2):
+            if self.in_air:
+                dx = self.speed
+
+        if not self.in_air:
+            self.vel_y = -8
+            self.in_air = True
+        self.vel_y += GRAVITY_SLIME
+        dy += self.vel_y
+
+        for tile in world.obstacle_list:
+            # check collision in the x direction
+            if tile[1].colliderect(self.rect.x + dx, self.rect.y, self.width, self.height):
+                dx = 0
+            # check for collision in the y direction
+            if tile[1].colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
+                # check if below the ground, i.e. jumping
+                if self.vel_y < 0:
+                    self.vel_y = 0
+                    dy = tile[1].bottom - self.rect.top
+                # check if above the ground, i.e. falling
+                elif self.vel_y >= 0:
+                    self.vel_y = 0
+                    self.in_air = False
+                    dy = tile[1].top - self.rect.bottom
+        if dy > GRAVITY_SLIME:
+            self.image = Slime.img_slime_down_air
+        elif dy < 0:
+            self.image = Slime.img_slime_jump
+
+        self.rect.x += dx
+        self.rect.y += dy
+
+    def kick(self, player):
+        self.hp -= player.damage
+        print('Слайм получил урон')
+        if self.hp <= 0:
+            self.kill()
+
+    def draw(self, screen):
+        screen.blit(self.image,  self.rect)
