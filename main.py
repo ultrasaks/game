@@ -84,24 +84,29 @@ def kick():
     else:
         kickpos = 32
     kickTest.rect.x, kickTest.rect.y = player.rect.x + kickpos, player.rect.y
-    # kicks.add(kickTest)
+    kicks.add(kickTest)
     player.isKick = 7
+
+
+def debug_mode():
+    kicks.draw(screen)
+    textsurface = font_debug.render(str(round(clock.get_fps())), False, (255, 255, 0))
+    screen.blit(textsurface, (0, 0))
 
 
 if __name__ == '__main__':
     pygame.init()
     pygame.display.set_caption('Test')
+
+    pygame.font.init()
+    font_debug = pygame.font.SysFont('sprites/8514fixr.fon', 50)
+
     clock = pygame.time.Clock()
     screen = pygame.display.set_mode(SCREEN_SIZE)
 
     enemies = pygame.sprite.Group()
-
-    for _ in range(10):
-        enem = Enemy(random.randint(
-            0, SCREEN_SIZE[0]), random.randint(100, 300))
-        enemies.add(enem)
-
     slimes = pygame.sprite.Group()
+
     # for _ in range(10):
     #     enem = Enemy(random.randint(0, SCREEN_SIZE[0]), random.randint(100, 300))
     #     enemies.add(enem)
@@ -129,22 +134,22 @@ if __name__ == '__main__':
         draw_bg()
         world.draw()
         player.draw(screen)
-        slime.draw(screen)
         slimes.draw(screen)
+        debug_mode()
 
         for enemy in slimes:
             if pygame.sprite.spritecollide(enemy, kicks, False):
-                pass
+                enemy.kick(player)
 
             if pygame.sprite.spritecollide(enemy, players, False):
                 player.kick(slime)
+            enemy.move(player, world)
         kicks.empty()
 
         if player.alive:
             player.move(moving_left, moving_right, world)
 
-        if slime.alive:
-            slime.move(player, world)
+        # slime.move(player, world)
 
         for event in pygame.event.get():
             if event.type == QUIT:

@@ -14,4 +14,3 @@ class Enemy(pygame.sprite.Sprite):
         self.hp = 100
         self.defence = 0  # потом
         self.damage = 0  # потом
-фв
