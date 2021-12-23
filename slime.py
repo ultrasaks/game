@@ -3,7 +3,6 @@
 import sys
 import os
 import pygame
-import slime as slime
 from pygame.locals import *
 from constants import *
 from load_image import load_image
@@ -19,6 +18,9 @@ class Slime(pygame.sprite.Sprite):
         load_image("enemy/slime/down.png"), (30, 30))
     img_slime_down = pygame.transform.scale(
         load_image("enemy/slime/down_up.png"), (30, 30))
+
+    img_slime_what = pygame.transform.scale(
+        load_image("enemy/slime/what.png"), (30, 30))
 
     def __init__(self, x, y, speed=5, *group):
         super().__init__(*group)
@@ -36,26 +38,44 @@ class Slime(pygame.sprite.Sprite):
         self.width = self.image.get_width()
         self.height = self.image.get_height()
         # зона поиска игрока
-        self.x2, self.y2 = (400, 100)
+        self.x2, self.y2 = (500, 80)
 
-    def move(self, player, world):
+        self.NN = 61
+        self.player_flip = True
+
+    def move(self, player, world, tolchok=0):
         dx = 0
         dy = 0
-        # корды которые определяют радиус
-        x, y = self.rect.center
+        if self.NN >= 15:
+            if tolchok == 1:
+                dx += 150
+            elif tolchok == 2:
+                dx -= 150
+            # корды которые определяют радиус
+            x, y = self.rect.center
 
-        if player.rect.x + 5 < self.rect.x and (x - self.x2, y - self.y2) < player.rect.center < (x + self.x2, y + self.y2):
-            if self.in_air:
-                dx = -self.speed
-        elif player.rect.x - 5 > self.rect.x and (x - self.x2, y - self.y2) < player.rect.center < (x + self.x2, y + self.y2):
-            if self.in_air:
-                dx = self.speed
+            if player.rect.x + 5 < self.rect.x and (x - self.x2, y - self.y2) < player.rect.center < (
+                    x + self.x2, y + self.y2):
+                if self.in_air:
+                    dx = -self.speed
+            elif player.rect.x - 5 > self.rect.x and (x - self.x2, y - self.y2) < player.rect.center < (
+                    x + self.x2, y + self.y2):
+                if self.in_air:
+                    dx = self.speed
 
-        if not self.in_air:
-            self.vel_y = -8
-            self.in_air = True
-        self.vel_y += GRAVITY_SLIME
-        dy += self.vel_y
+            if not self.in_air:
+                self.vel_y = -8
+                self.in_air = True
+            self.vel_y += GRAVITY_SLIME
+            dy += self.vel_y
+        else:
+
+            self.NN += 1
+            if self.player_flip:
+                dx -= 4
+            else:
+                dx += 4
+            dy += 1.5
 
         for tile in world.obstacle_list:
             # check collision in the x direction
@@ -72,16 +92,20 @@ class Slime(pygame.sprite.Sprite):
                     self.vel_y = 0
                     self.in_air = False
                     dy = tile[1].top - self.rect.bottom
-        if dy > GRAVITY_SLIME:
-            self.image = Slime.img_slime_down_air
-        elif dy < 0:
-            self.image = Slime.img_slime_jump
+        if self.NN >= 15:
+            if dy > GRAVITY_SLIME:
+                self.image = Slime.img_slime_down_air
+            elif dy < 0:
+                self.image = Slime.img_slime_jump
+        else:
+            self.image = Slime.img_slime_what
 
         self.rect.x += dx
         self.rect.y += dy
 
-    def kick(self, player):
-        self.hp -= player.damage
+    def kick(self, player, world):
+        self.NN = 0
+        self.player_flip = player.flip
         print('Слайм получил урон')
         if self.hp <= 0:
             self.kill()
