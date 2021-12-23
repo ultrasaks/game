@@ -7,6 +7,7 @@ import slime as slime
 from pygame.locals import *
 from constants import *
 from load_image import load_image
+import random
 
 # slime
 
@@ -82,6 +83,8 @@ class Slime(pygame.sprite.Sprite):
     def kick(self, player):
         self.hp -= player.damage
         print('Слайм получил урон')
+        if self.hp <= 0:
+            self.kill()
 
     def draw(self, screen):
         screen.blit(self.image,  self.rect)

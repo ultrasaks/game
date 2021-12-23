@@ -25,7 +25,7 @@ class Player(pygame.sprite.Sprite):
         self.alive = True
         self.doubleJ = False
         self.defence = 0  # потом
-        self.damage = 10  # потом
+        self.damage = 20  # потом
         self.hp = 100  # потом
         self.width = self.image.get_width()
         self.height = self.image.get_height()
@@ -112,7 +112,7 @@ class Player(pygame.sprite.Sprite):
 
     def kick(self, slime):
         self.hp -= slime.damage
-        print("Герой крыс получил урон")
+        # print("Герой крыс получил урон")
 
     def draw(self, screen):
         screen.blit(pygame.transform.flip(
