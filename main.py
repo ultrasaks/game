@@ -12,6 +12,7 @@ from slime import Slime
 
 moving_left = False
 moving_right = False
+scroll_x, scroll_y = 0, 0
 
 
 img_list = []
@@ -30,7 +31,6 @@ class World():
         for y, row in enumerate(data):
             for x, tile in enumerate(row):
                 if tile >= 0:
-
                     img = img_list[tile]
                     img_rect = img.get_rect()
                     img_rect.x = x * TILE_SIZE
@@ -47,7 +47,7 @@ class World():
                         slime = Slime(x * 38, y * 38, 2)
                         pass
                     elif tile == 16:
-                        # enemy = Soldier('enemy', x * TILE_SIZE, y * TILE_SIZE, 1.65, 2, 20, 0)
+                        # enemy =
                         # enemy_group.add(enemy)
                         pass
                     elif tile == 20:
@@ -59,6 +59,8 @@ class World():
 
     def draw(self):
         for tile in self.obstacle_list:
+            tile[1][0] += scroll_x
+            # tile[1][1] += scroll_y
             screen.blit(tile[0], tile[1])
 
 
@@ -82,7 +84,7 @@ def kick():
     if player.flip:
         kickpos = -20
     else:
-        kickpos = 32
+        kickpos = 20
     kickTest.rect.x, kickTest.rect.y = player.rect.x + kickpos, player.rect.y
     kicks.add(kickTest)
     player.isKick = 7
@@ -116,22 +118,23 @@ if __name__ == '__main__':
     vol = 0.2
     pygame.mixer.music.set_volume(vol)
 
-    # for _ in range(10):
-    #     enem = Enemy(random.randint(0, SCREEN_SIZE[0]), random.randint(100, 300))
-    #     enemies.add(enem)
-
     running = True
     kicks = pygame.sprite.Group()
     players = pygame.sprite.Group()
     decoration_group = pygame.sprite.Group()
 
     world_data = []
-    for row in range(16):
-        r = [-1] * 150
-        world_data.append(r)
     with open(f'levels/level1_data.csv', newline='') as csvfile:
         reader = csv.reader(csvfile, delimiter=',')
-        for x, row in enumerate(reader):
+        readerData = [row for row in reader]
+
+        rows = len(readerData)  # создание пустого уровня
+        cols = len(readerData[0])
+        for row in range(rows):
+            r = [-1] * cols
+            world_data.append(r)
+
+        for x, row in enumerate(readerData):
             for y, tile in enumerate(row):
                 world_data[x][y] = int(tile)
     world = World()
@@ -140,25 +143,27 @@ if __name__ == '__main__':
     players.add(player)
 
     while running:
-
         draw_bg()
         world.draw()
         player.draw(screen)
-        slimes.draw(screen)
         debug_mode()
 
         for enemy in slimes:
+            enemy.update(scroll_x)
             if pygame.sprite.spritecollide(enemy, kicks, False):
                 enemy.kick(player, world)
 
             if pygame.sprite.spritecollide(enemy, players, False):
-                player.kick(slime)
-
+                player.kick(enemy)
             enemy.move(player, world)
         kicks.empty()
+        scroll_x, scroll_y = 0, 0
+
+
+        slimes.draw(screen)
 
         if player.alive:
-            player.move(moving_left, moving_right, world)
+            scroll_x, scroll_y = player.move(moving_left, moving_right, world)
 
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -166,7 +171,6 @@ if __name__ == '__main__':
             if event.type == KEYDOWN:
                 if event.type == KEYDOWN:
                     if event.key in [K_a]:
-
                         moving_left = True
                     if event.key in [K_d]:
                         moving_right = True
