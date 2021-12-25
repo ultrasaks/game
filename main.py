@@ -90,7 +90,8 @@ def kick():
 
 def debug_mode():
     kicks.draw(screen)
-    textsurface = font_debug.render(str(round(clock.get_fps())), False, (255, 255, 0))
+    textsurface = font_debug.render(
+        str(round(clock.get_fps())), False, (255, 255, 0))
     screen.blit(textsurface, (0, 0))
 
 
@@ -106,6 +107,14 @@ if __name__ == '__main__':
 
     enemies = pygame.sprite.Group()
     slimes = pygame.sprite.Group()
+
+    kick_sound = pygame.mixer.Sound("sounds/kick.wav")
+    jump_sound = pygame.mixer.Sound("sounds/jump.wav")
+    jump2_sound = pygame.mixer.Sound("sounds/djump.wav")
+    pygame.mixer.music.load("sounds/music.mp3")
+    pygame.mixer.music.play(loops=-1, start=0.0, fade_ms=0)
+    vol = 0.2
+    pygame.mixer.music.set_volume(vol)
 
     # for _ in range(10):
     #     enem = Enemy(random.randint(0, SCREEN_SIZE[0]), random.randint(100, 300))
@@ -131,6 +140,7 @@ if __name__ == '__main__':
     players.add(player)
 
     while running:
+
         draw_bg()
         world.draw()
         player.draw(screen)
@@ -139,17 +149,16 @@ if __name__ == '__main__':
 
         for enemy in slimes:
             if pygame.sprite.spritecollide(enemy, kicks, False):
-                enemy.kick(player)
+                enemy.kick(player, world)
 
             if pygame.sprite.spritecollide(enemy, players, False):
                 player.kick(slime)
+
             enemy.move(player, world)
         kicks.empty()
 
         if player.alive:
             player.move(moving_left, moving_right, world)
-
-        # slime.move(player, world)
 
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -157,15 +166,21 @@ if __name__ == '__main__':
             if event.type == KEYDOWN:
                 if event.type == KEYDOWN:
                     if event.key in [K_a]:
+
                         moving_left = True
                     if event.key in [K_d]:
                         moving_right = True
                     if event.key in [K_w] and player.alive and (
                             not player.in_air or player.doubleJ):
+                        if not player.in_air:
+                            jump_sound.play()
+                        else:
+                            jump2_sound.play()
                         player.jump = True
                     if event.key in [K_ESCAPE]:
                         run = False
                     if event.key in [K_SPACE]:
+                        kick_sound.play()
                         kick()
             if event.type == KEYUP:
                 if event.key in [K_a]:
