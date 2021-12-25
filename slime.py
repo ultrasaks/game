@@ -46,7 +46,7 @@ class Slime(pygame.sprite.Sprite):
     def move(self, player, world, tolchok=0):
         dx = 0
         dy = 0
-        if self.NN >= 15:
+        if self.NN >= 10:
             if tolchok == 1:
                 dx += 150
             elif tolchok == 2:
@@ -69,13 +69,13 @@ class Slime(pygame.sprite.Sprite):
             self.vel_y += GRAVITY_SLIME
             dy += self.vel_y
         else:
-
             self.NN += 1
             if self.player_flip:
-                dx -= 4
+                dx -= 8
             else:
-                dx += 4
+                dx += 8
             dy += 1.5
+            dy += GRAVITY_SLIME
 
         for tile in world.obstacle_list:
             # check collision in the x direction
@@ -105,10 +105,11 @@ class Slime(pygame.sprite.Sprite):
 
     def kick(self, player, world):
         self.NN = 0
+        self.hp -= player.damage
         self.player_flip = player.flip
-        print('Слайм получил урон')
+        print(f'Слайм получил урон|{self.hp}')
         if self.hp <= 0:
             self.kill()
 
-    def draw(self, screen):
-        screen.blit(self.image,  self.rect)
+    def update(self, x, y=0):
+        self.rect.x += x
