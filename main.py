@@ -59,7 +59,7 @@ class World():
 
     def draw(self):
         for tile in self.obstacle_list:
-            tile[1][0] += scroll_x
+            # tile[1][0] += scroll_x
             # tile[1][1] += scroll_y
             screen.blit(tile[0], tile[1])
 
@@ -163,7 +163,7 @@ if __name__ == '__main__':
         slimes.draw(screen)
 
         if player.alive:
-            scroll_x, scroll_y = player.move(moving_left, moving_right, world)
+            player.move(moving_left, moving_right, world)
 
         for event in pygame.event.get():
             if event.type == QUIT:

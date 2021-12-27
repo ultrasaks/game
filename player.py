@@ -111,10 +111,10 @@ class Player(pygame.sprite.Sprite):
         self.rect.x += dx
         self.rect.y += dy
         scroll_x, scroll_y = 0, 0
-        if (self.rect.right > SCREEN_SIZE[0] - 350) \
-                or (self.rect.left < 350):
-            self.rect.x -= dx
-            scroll_x = -dx
+        # if (self.rect.right > SCREEN_SIZE[0] - 350) \
+        #         or (self.rect.left < 350):
+        #     self.rect.x -= dx
+        #     scroll_x = -dx
         # БАГИ БАГИ БАГИ!!!
         # if (self.rect.bottom > SCREEN_SIZE[1] - 200) \
         #         or (self.rect.bottom < 200):
