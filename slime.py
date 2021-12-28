@@ -111,5 +111,6 @@ class Slime(pygame.sprite.Sprite):
         if self.hp <= 0:
             self.kill()
 
-    def update(self, x, y=0):
-        self.rect.x += x
+    def update(self, scroll):
+        self.rect.x -= scroll[0]
+        self.rect.y -= scroll[1]

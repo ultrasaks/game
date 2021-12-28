@@ -6,13 +6,16 @@ import csv
 from pygame.locals import *
 from load_image import load_image
 from player import Player
+from camera import Camera
 from enemy import Enemy
 from constants import *
 from slime import Slime
 
 moving_left = False
 moving_right = False
-scroll_x, scroll_y = 0, 0
+scroll_data = []
+scroll = [0, 0]
+true_scroll = [0, 0]
 
 
 img_list = []
@@ -57,11 +60,10 @@ class World():
 
         return player, slime
 
-    def draw(self):
-        for tile in self.obstacle_list:
-            # tile[1][0] += scroll_x
-            # tile[1][1] += scroll_y
-            screen.blit(tile[0], tile[1])
+    def draw(self, scroll_data):
+        for tile in scroll_data:
+
+            display.blit(tile[0], tile[1])
 
 
 class Decoration(pygame.sprite.Sprite):
@@ -74,7 +76,7 @@ class Decoration(pygame.sprite.Sprite):
 
 
 def draw_bg():
-    screen.fill((105, 193, 231))
+    display.fill((105, 193, 231))
 
 
 def kick():
@@ -94,7 +96,7 @@ def debug_mode():
     kicks.draw(screen)
     textsurface = font_debug.render(
         str(round(clock.get_fps())), False, (255, 255, 0))
-    screen.blit(textsurface, (0, 0))
+    display.blit(textsurface, (0, 0))
 
 
 if __name__ == '__main__':
@@ -105,7 +107,8 @@ if __name__ == '__main__':
     font_debug = pygame.font.SysFont('sprites/8514fixr.fon', 50)
 
     clock = pygame.time.Clock()
-    screen = pygame.display.set_mode(SCREEN_SIZE)
+    screen = pygame.display.set_mode(SCREEN_SIZE, 0,32)
+    display = pygame.Surface(DISPLAY_SIZE, 0,32)
 
     enemies = pygame.sprite.Group()
     slimes = pygame.sprite.Group()
@@ -141,29 +144,36 @@ if __name__ == '__main__':
     player, slime = world.process_data(world_data)
     slimes.add(slime)
     players.add(player)
+    camera = Camera()
 
     while running:
+        true_scroll[0] = (player.rect.center[0] - true_scroll[0] - 500)/20
+        true_scroll[1] = (player.rect.center[1] - true_scroll[1] - 250)/20
+        scroll = true_scroll.copy()
+        scroll[0], scroll[1] = int(scroll[0]), int(scroll[1])
+        slimes.draw(display)
+        scroll_data = camera.obstacle_list(world, scroll)
         draw_bg()
-        world.draw()
-        player.draw(screen)
+        world.draw(scroll_data)
+        player.draw(display)
         debug_mode()
 
         for enemy in slimes:
-            enemy.update(scroll_x)
+
             if pygame.sprite.spritecollide(enemy, kicks, False):
                 enemy.kick(player, world)
 
             if pygame.sprite.spritecollide(enemy, players, False):
                 player.kick(enemy)
             enemy.move(player, world)
+            enemy.update(scroll)
         kicks.empty()
-        scroll_x, scroll_y = 0, 0
 
 
-        slimes.draw(screen)
 
         if player.alive:
             player.move(moving_left, moving_right, world)
+            player.update(scroll)
 
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -191,6 +201,7 @@ if __name__ == '__main__':
                     moving_left = False
                 if event.key in [K_d]:
                     moving_right = False
+        screen.blit(pygame.transform.scale(display, SCREEN_SIZE), (0, 0))
         clock.tick(FPS)
         pygame.display.flip()
     pygame.quit()
