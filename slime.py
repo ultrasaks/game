@@ -30,6 +30,7 @@ class Slime(pygame.sprite.Sprite):
         self.flip = False
         self.alive = True
         self.hp = 100
+        self.contact = 0
 
         self.damage = 15
 
@@ -106,7 +107,7 @@ class Slime(pygame.sprite.Sprite):
 
     def kick(self, player):
         self.NN = 0
-        self.hp -= player.damage
+        self.hp -= random.randint(player.damage[0], player.damage[1])
         self.player_flip = player.flip
         print(f'Слайм получил урон|{self.hp}')
         if self.hp <= 0:
