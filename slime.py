@@ -12,15 +12,11 @@ import random
 
 
 class Slime(pygame.sprite.Sprite):
-    img_slime_jump = pygame.transform.scale(
-        load_image("enemy/slime/jump.png"), (30, 30))
-    img_slime_down_air = pygame.transform.scale(
-        load_image("enemy/slime/down.png"), (30, 30))
-    img_slime_down = pygame.transform.scale(
-        load_image("enemy/slime/down_up.png"), (30, 30))
+    img_slime_jump = pygame.transform.scale(load_image("enemy/slime/jump.png"), (30, 30))
+    img_slime_down_air = pygame.transform.scale(load_image("enemy/slime/down.png"), (30, 30))
+    img_slime_down = pygame.transform.scale(load_image("enemy/slime/down_up.png"), (30, 30))
+    img_slime_what = pygame.transform.scale(load_image("enemy/slime/what.png"), (30, 30))
 
-    img_slime_what = pygame.transform.scale(
-        load_image("enemy/slime/what.png"), (30, 30))
 
     def __init__(self, x, y, speed=5, *group):
         super().__init__(*group)
@@ -34,16 +30,26 @@ class Slime(pygame.sprite.Sprite):
         self.flip = False
         self.alive = True
         self.hp = 100
+<<<<<<< HEAD
         self.damage = 15
+=======
+        self.damage = 10
+>>>>>>> fb41dcda16484580976a6911e9bee139bca42a00
         self.width = self.image.get_width()
         self.height = self.image.get_height()
         # зона поиска игрока
         self.x2, self.y2 = (500, 80)
+        self.contact = 0  # кадры контакта с игроком
 
         self.NN = 61
         self.player_flip = True
 
+<<<<<<< HEAD
     def move(self, player, world,scroll, tolchok=0):
+=======
+
+    def move(self, player, world, tolchok=0):
+>>>>>>> fb41dcda16484580976a6911e9bee139bca42a00
         dx = 0
         dy = 0
         if self.NN >= 15:
@@ -96,18 +102,18 @@ class Slime(pygame.sprite.Sprite):
 
         if self.NN >= 15:
             if dy > GRAVITY_SLIME:
-                self.image = Slime.img_slime_down_air
+                self.image = self.img_slime_down_air
             elif dy < 0:
-                self.image = Slime.img_slime_jump
+                self.image = self.img_slime_jump
         else:
-            self.image = Slime.img_slime_what
+            self.image = self.img_slime_what
 
         self.rect.x += dx
         self.rect.y += dy
 
     def kick(self, player, world):
         self.NN = 0
-        self.hp -= player.damage
+        self.hp -= random.randint(player.damage[0], player.damage[1])
         self.player_flip = player.flip
         print(f'Слайм получил урон|{self.hp}')
         if self.hp <= 0:

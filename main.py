@@ -54,20 +54,28 @@ class World():
                             img, x * TILE_SIZE, y * TILE_SIZE)
                         decoration_group.add(decoration)
                     elif tile == 15:
+<<<<<<< HEAD
                         player = Player(x * 38 , y * 38, 5)
                         slime = Slime(x * 38, y * 38, 2)
                         rage_slime = RageSlime(x * 38 + 10, y * 38, 2)
+=======
+                        player = Player(x * 38, y * 38, 5)
+>>>>>>> fb41dcda16484580976a6911e9bee139bca42a00
                         pass
                     elif tile == 16:
-                        # enemy =
-                        # enemy_group.add(enemy)
+                        slime = Slime(x * 38, y * 38, 2)
+                        slimes.add(slime)
                         pass
                     elif tile == 20:
                         # exit = Exit(img, x * TILE_SIZE, y * TILE_SIZE)
                         # exit_group.add(exit)
                         pass
 
+<<<<<<< HEAD
         return player, slime, rage_slime
+=======
+        return player
+>>>>>>> fb41dcda16484580976a6911e9bee139bca42a00
 
 <<<<<<< Updated upstream
     def draw(self, scroll_data):
@@ -101,6 +109,12 @@ def draw_bg():
 =======
 >>>>>>> Stashed changes
 
+def draw_hp():
+    pygame.draw.rect(screen, (215, 24, 44), (0, 0, 200, 30))
+    # pygame.draw.ellipse(screen, (21, 143, 26), (0, 0, player.hp * 2, 30))
+    pygame.draw.rect(screen, (21, 143, 26), (0, 0, player.hp * 2, 30))
+
+
 def kick():
     kickTest = pygame.sprite.Sprite()
     kickTest.image = load_image('hit.png')
@@ -109,7 +123,7 @@ def kick():
         kickpos = -20
     else:
         kickpos = 20
-    kickTest.rect.x, kickTest.rect.y = player.rect.x + kickpos, player.rect.y
+    kickTest.rect.x, kickTest.rect.y = player.rect.x + kickpos, player.rect.y - 13
     kicks.add(kickTest)
     player.isKick = 7
 
@@ -118,7 +132,7 @@ def debug_mode():
     kicks.draw(screen)
     textsurface = font_debug.render(
         str(round(clock.get_fps())), False, (255, 255, 0))
-    display.blit(textsurface, (0, 0))
+    display.blit(textsurface, (210, 0))
 
 
 if __name__ == '__main__':
@@ -167,9 +181,13 @@ if __name__ == '__main__':
             for y, tile in enumerate(row):
                 world_data[x][y] = int(tile)
     world = World()
+<<<<<<< HEAD
     player, slime, rage_slime = world.process_data(world_data)
     enemies.add(slime)
     enemies.add(rage_slime)
+=======
+    player = world.process_data(world_data)
+>>>>>>> fb41dcda16484580976a6911e9bee139bca42a00
     players.add(player)
     camera = Camera()
 
@@ -178,10 +196,12 @@ if __name__ == '__main__':
 
 
         scroll_data = camera.obstacle_list(world, scroll)
+        
         draw_bg()
         world.draw(scroll_data)
         enemies.draw(display)
         player.draw(display)
+        draw_hp()
         debug_mode()
 
         for enemy in enemies:
@@ -206,8 +226,17 @@ if __name__ == '__main__':
                 enemy.kick(player, world)
 
             if pygame.sprite.spritecollide(enemy, players, False):
+<<<<<<< HEAD
                 player.kick(enemy)
 <<<<<<< Updated upstream
+=======
+                if enemy.contact == 5:
+                    player.kick(enemy)
+                    enemy.contact = 0
+                enemy.contact += 1
+            else:
+                enemy.contact = 0
+>>>>>>> fb41dcda16484580976a6911e9bee139bca42a00
             enemy.move(player, world)
             enemy.update(scroll)
         kicks.empty()
@@ -240,22 +269,24 @@ if __name__ == '__main__':
                 running = False
             if event.type == KEYDOWN:
                 if event.type == KEYDOWN:
-                    if event.key in [K_a]:
-                        moving_left = True
-                    if event.key in [K_d]:
-                        moving_right = True
-                    if event.key in [K_w] and player.alive and (
-                            not player.in_air or player.doubleJ):
-                        if not player.in_air:
-                            jump_sound.play()
-                        else:
-                            jump2_sound.play()
-                        player.jump = True
+                    if player.alive:
+                        if event.key in [K_a]:
+                            moving_left = True
+                        if event.key in [K_d]:
+                            moving_right = True
+                        if event.key in [K_w] and (
+                                not player.in_air or player.doubleJ):
+                            if not player.in_air:
+                                jump_sound.play()
+                            else:
+                                jump2_sound.play()
+                            player.jump = True
+                        if event.key in [K_SPACE]:
+                            kick_sound.play()
+                            kick()
                     if event.key in [K_ESCAPE]:
-                        run = False
-                    if event.key in [K_SPACE]:
-                        kick_sound.play()
-                        kick()
+                        running = False
+
             if event.type == KEYUP:
                 if event.key in [K_a]:
                     moving_left = False
