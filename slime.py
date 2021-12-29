@@ -30,11 +30,9 @@ class Slime(pygame.sprite.Sprite):
         self.flip = False
         self.alive = True
         self.hp = 100
-<<<<<<< HEAD
+
         self.damage = 15
-=======
-        self.damage = 10
->>>>>>> fb41dcda16484580976a6911e9bee139bca42a00
+
         self.width = self.image.get_width()
         self.height = self.image.get_height()
         # зона поиска игрока
@@ -44,12 +42,7 @@ class Slime(pygame.sprite.Sprite):
         self.NN = 61
         self.player_flip = True
 
-<<<<<<< HEAD
-    def move(self, player, world,scroll, tolchok=0):
-=======
-
     def move(self, player, world, tolchok=0):
->>>>>>> fb41dcda16484580976a6911e9bee139bca42a00
         dx = 0
         dy = 0
         if self.NN >= 15:
@@ -113,20 +106,16 @@ class Slime(pygame.sprite.Sprite):
 
     def kick(self, player, world):
         self.NN = 0
-        self.hp -= random.randint(player.damage[0], player.damage[1])
+        self.hp -= player.damage
         self.player_flip = player.flip
         print(f'Слайм получил урон|{self.hp}')
         if self.hp <= 0:
             self.kill()
 
     def update(self, scroll):
-<<<<<<< Updated upstream
+
         self.rect.x -= scroll[0]
         self.rect.y -= scroll[1]
-=======
-        self.rect.x = scroll[0]
-        self.rect.y = scroll[1]
 
 
 
->>>>>>> Stashed changes

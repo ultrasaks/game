@@ -28,7 +28,7 @@ class Player(pygame.sprite.Sprite):
         self.alive = True
         self.doubleJ = False
         self.defence = 0  # потом
-        self.damage = 15, 30  # потом
+        self.damage = 15
         self.hp = 100  # потом
         self.width = self.image.get_width()
         self.height = self.image.get_height()
@@ -130,17 +130,12 @@ class Player(pygame.sprite.Sprite):
     def draw(self, display):
         display.blit(pygame.transform.flip(
             self.image, self.flip, False), self.rect)
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-=======
 
->>>>>>> fb41dcda16484580976a6911e9bee139bca42a00
     def update(self, scroll):
         self.rect.x -= scroll[0]
         self.rect.y -= scroll[1]
-=======
+
 
     def update(self, scroll):
-        self.rect.x -= 0
-        self.rect.y -= 0
->>>>>>> Stashed changes
+        self.rect.x -= scroll[0]
+        self.rect.y -= scroll[1]
