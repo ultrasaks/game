@@ -10,6 +10,7 @@ from camera import Camera
 from enemy import Enemy
 from constants import *
 from slime import Slime
+from rage_slime import RageSlime
 
 moving_left = False
 moving_right = False
@@ -48,6 +49,7 @@ class World():
                     elif tile == 15:
                         player = Player(x * 38, y * 38, 5)
                         slime = Slime(x * 38, y * 38, 2)
+                        rage_slime = RageSlime(x * 38 + 10, y * 38, 2)
                         pass
                     elif tile == 16:
                         # enemy =
@@ -58,7 +60,7 @@ class World():
                         # exit_group.add(exit)
                         pass
 
-        return player, slime
+        return player, slime, rage_slime
 
     def draw(self, scroll_data):
         for tile in scroll_data:
@@ -111,7 +113,6 @@ if __name__ == '__main__':
     display = pygame.Surface(DISPLAY_SIZE, 0,32)
 
     enemies = pygame.sprite.Group()
-    slimes = pygame.sprite.Group()
 
     kick_sound = pygame.mixer.Sound("sounds/kick.wav")
     jump_sound = pygame.mixer.Sound("sounds/jump.wav")
@@ -141,24 +142,23 @@ if __name__ == '__main__':
             for y, tile in enumerate(row):
                 world_data[x][y] = int(tile)
     world = World()
-    player, slime = world.process_data(world_data)
-    slimes.add(slime)
+    player, slime, rage_slime = world.process_data(world_data)
+    enemies.add(slime)
+    enemies.add(rage_slime)
     players.add(player)
     camera = Camera()
 
     while running:
-        true_scroll[0] = (player.rect.center[0] - true_scroll[0] - 500)/20
-        true_scroll[1] = (player.rect.center[1] - true_scroll[1] - 250)/20
-        scroll = true_scroll.copy()
-        scroll[0], scroll[1] = int(scroll[0]), int(scroll[1])
-        slimes.draw(display)
+
+
         scroll_data = camera.obstacle_list(world, scroll)
         draw_bg()
         world.draw(scroll_data)
+        enemies.draw(display)
         player.draw(display)
         debug_mode()
 
-        for enemy in slimes:
+        for enemy in enemies:
 
             if pygame.sprite.spritecollide(enemy, kicks, False):
                 enemy.kick(player, world)
@@ -174,6 +174,12 @@ if __name__ == '__main__':
         if player.alive:
             player.move(moving_left, moving_right, world)
             player.update(scroll)
+
+        true_scroll[0] = (player.rect.center[0] - true_scroll[0] - A_scroll) // 15
+        true_scroll[1] = (player.rect.center[1] - true_scroll[1] - B_scroll) // 15
+        scroll = true_scroll.copy()
+        scroll[0], scroll[1] = int(scroll[0]), int(scroll[1])
+
 
         for event in pygame.event.get():
             if event.type == QUIT:
