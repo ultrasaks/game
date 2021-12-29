@@ -3,6 +3,8 @@ import os
 import sys
 import random
 import csv
+
+import scrolls as scrolls
 from pygame.locals import *
 from load_image import load_image
 from player import Player
@@ -160,19 +162,22 @@ if __name__ == '__main__':
         for enemy in enemies:
 
             if pygame.sprite.spritecollide(enemy, kicks, False):
-                enemy.kick(player, world)
+                enemy.kick(player)
 
             if pygame.sprite.spritecollide(enemy, players, False):
                 player.kick(enemy)
-            enemy.move(player, world)
+
             enemy.update(scroll)
+            enemy.move(player, scroll_data)
+
         kicks.empty()
 
 
 
         if player.alive:
-            player.move(moving_left, moving_right, world)
             player.update(scroll)
+            player.move(moving_left, moving_right, scroll_data)
+
 
         true_scroll[0] = (player.rect.center[0] - true_scroll[0] - A_scroll) // 15
         true_scroll[1] = (player.rect.center[1] - true_scroll[1] - B_scroll) // 15

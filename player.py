@@ -87,7 +87,7 @@ class Player(pygame.sprite.Sprite):
         self.vel_y += GRAVITY
         dy += self.vel_y
 
-        for tile in world.obstacle_list:
+        for tile in world:
             # check collision in the x direction
             if tile[1].colliderect(self.rect.x + dx, self.rect.y, self.width, self.height):
                 dx = 0
@@ -130,11 +130,6 @@ class Player(pygame.sprite.Sprite):
     def draw(self, display):
         display.blit(pygame.transform.flip(
             self.image, self.flip, False), self.rect)
-
-    def update(self, scroll):
-        self.rect.x -= scroll[0]
-        self.rect.y -= scroll[1]
-
 
     def update(self, scroll):
         self.rect.x -= scroll[0]
