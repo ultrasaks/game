@@ -74,12 +74,12 @@ class Player(pygame.sprite.Sprite):
             self.image = self.baseSprite
 
         if self.jump and not self.in_air:  # прыжок
-            self.vel_y = -11
+            self.vel_y = -13
             self.jump = False
             self.doubleJ = True
             self.in_air = True
         elif self.jump and self.doubleJ:  # двойной прыжок
-            self.vel_y = -9
+            self.vel_y = -10
             self.jump = False
             self.doubleJ = False
             self.in_air = True
@@ -117,26 +117,7 @@ class Player(pygame.sprite.Sprite):
 
         self.rect.x += dx
         self.rect.y += dy
-        scroll_x, scroll_y = 0, 0
-        if (self.rect.right > SCREEN_SIZE[0] - 350) \
-                or (self.rect.left < 350):
-            self.rect.x -= dx
-            scroll_x = -dx
-        # БАГИ БАГИ БАГИ!!!
-        # if (self.rect.bottom > SCREEN_SIZE[1] - 200) \
-        #         or (self.rect.bottom < 200):
-        #     if self.rect.bottom < 200:
-        #         if dy == 0.75:
-        #             dy = 2
-        #         self.rect.y = math.fabs(dy)
-        #         scroll_y = math.fabs(dy)
-        #     else:
-        #         if dy == 0.75:
-        #             dy = 2
-        #         self.rect.y -= math.fabs(dy)
-        #         scroll_y = -math.fabs(dy)
-        #     print(scroll_y, dy)
-        return scroll_x, scroll_y
+
 
     def kick(self, enemy):
         if self.delay == 0:
@@ -147,4 +128,9 @@ class Player(pygame.sprite.Sprite):
         # print("Герой крыс получил урон")
 
     def draw(self, screen):
-        screen.blit(pygame.transform.flip(self.image, self.flip, False), self.rect)
+        screen.blit(pygame.transform.flip(
+            self.image, self.flip, False), self.rect)
+
+    def update(self, scroll):
+        self.rect.x -= scroll[0]
+        self.rect.y -= scroll[1]
