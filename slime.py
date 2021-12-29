@@ -30,7 +30,6 @@ class Slime(pygame.sprite.Sprite):
         self.flip = False
         self.alive = True
         self.hp = 100
-        self.contact = 0
 
         self.damage = 15
 
@@ -114,9 +113,6 @@ class Slime(pygame.sprite.Sprite):
             self.kill()
 
     def update(self, scroll):
-
         self.rect.x -= scroll[0]
         self.rect.y -= scroll[1]
-
-
 

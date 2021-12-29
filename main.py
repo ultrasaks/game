@@ -4,7 +4,7 @@ import sys
 import random
 import csv
 
-import scrolls as scrolls
+
 from pygame.locals import *
 from load_image import load_image
 from player import Player
@@ -27,7 +27,7 @@ for x in range(21):
     img_list.append(img)
 
 
-class World():
+class World:
     def __init__(self):
         self.obstacle_list = []
 
@@ -159,37 +159,28 @@ if __name__ == '__main__':
         world.draw(scroll_data)
         enemies.draw(display)
         player.draw(display)
-        debug_mode()
         draw_hp()
 
+        debug_mode()
         for enemy in enemies:
             if pygame.sprite.spritecollide(enemy, kicks, False):
                 enemy.kick(player)
 
             if pygame.sprite.spritecollide(enemy, players, False):
-
-                player.kick(enemy)
-
-
                 if enemy.contact == 5:
                     player.kick(enemy)
                     enemy.contact = 0
                 enemy.contact += 1
             else:
                 enemy.contact = 0
- 
-
             enemy.update(scroll)
             enemy.move(player, scroll_data)
 
         kicks.empty()
 
         if player.alive:
-
-            player.update(scroll)
             player.move(moving_left, moving_right, scroll_data)
-
-
+        player.update(scroll)  # не поднимай вверх, оно должно быть и когда игрок не умер
 
         true_scroll[0] = (player.rect.center[0] - true_scroll[0] - A_scroll) // 15
         true_scroll[1] = (player.rect.center[1] - true_scroll[1] - B_scroll) // 15

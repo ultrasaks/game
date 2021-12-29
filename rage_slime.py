@@ -33,7 +33,7 @@ class RageSlime(pygame.sprite.Sprite):
         self.in_air = False
         self.flip = False
         self.alive = True
-        self.hp = 200
+        self.hp = 150
         self.damage = 20
         self.width = self.image.get_width()
         self.height = self.image.get_height()
