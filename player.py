@@ -28,7 +28,7 @@ class Player(pygame.sprite.Sprite):
         self.alive = True
         self.doubleJ = False
         self.defence = 0  # потом
-        self.damage = 15
+        self.damage = 15, 30
         self.hp = 100  # потом
         self.width = self.image.get_width()
         self.height = self.image.get_height()
@@ -74,12 +74,12 @@ class Player(pygame.sprite.Sprite):
             self.image = self.baseSprite
 
         if self.jump and not self.in_air:  # прыжок
-            self.vel_y = -13
+            self.vel_y = -12
             self.jump = False
             self.doubleJ = True
             self.in_air = True
         elif self.jump and self.doubleJ:  # двойной прыжок
-            self.vel_y = -10
+            self.vel_y = -9
             self.jump = False
             self.doubleJ = False
             self.in_air = True

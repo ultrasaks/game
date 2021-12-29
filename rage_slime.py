@@ -34,7 +34,7 @@ class RageSlime(pygame.sprite.Sprite):
         self.flip = False
         self.alive = True
         self.hp = 200
-        self.damage = 30
+        self.damage = 20
         self.width = self.image.get_width()
         self.height = self.image.get_height()
         # зона поиска игрока
@@ -42,6 +42,7 @@ class RageSlime(pygame.sprite.Sprite):
 
         self.NN = 61
         self.player_flip = True
+        self.contact = 0
 
     def move(self, player, world, tolchok=0):
         dx = 0
@@ -105,7 +106,7 @@ class RageSlime(pygame.sprite.Sprite):
 
     def kick(self, player, world):
         self.NN = 0
-        self.hp -= player.damage
+        self.hp -= random.randint(player.damage[0], player.damage[1])
         self.player_flip = player.flip
         print(f'Слайм получил урон|{self.hp}')
         if self.hp <= 0:
