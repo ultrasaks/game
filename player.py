@@ -92,7 +92,7 @@ class Player(pygame.sprite.Sprite):
             if tile[1].colliderect(self.rect.x + dx, self.rect.y, self.width, self.height):
                 dx = 0
             # check for collision in the y direction
-            if tile[1].colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
+            if tile[1].colliderect(self.rect.x , self.rect.y + dy, self.width, self.height):
                 # check if below the ground, i.e. jumping
                 if self.vel_y < 0:
                     self.vel_y = 0
@@ -127,10 +127,20 @@ class Player(pygame.sprite.Sprite):
             self.alive = False
         # print("Герой крыс получил урон")
 
-    def draw(self, screen):
-        screen.blit(pygame.transform.flip(
+    def draw(self, display):
+        display.blit(pygame.transform.flip(
             self.image, self.flip, False), self.rect)
+<<<<<<< HEAD
+<<<<<<< Updated upstream
+=======
 
+>>>>>>> fb41dcda16484580976a6911e9bee139bca42a00
     def update(self, scroll):
         self.rect.x -= scroll[0]
         self.rect.y -= scroll[1]
+=======
+
+    def update(self, scroll):
+        self.rect.x -= 0
+        self.rect.y -= 0
+>>>>>>> Stashed changes

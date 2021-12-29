@@ -11,45 +11,39 @@ import random
 # slime
 
 
-class Slime(pygame.sprite.Sprite):
-    img_slime_jump = pygame.transform.scale(load_image("enemy/slime/jump.png"), (30, 30))
-    img_slime_down_air = pygame.transform.scale(load_image("enemy/slime/down.png"), (30, 30))
-    img_slime_down = pygame.transform.scale(load_image("enemy/slime/down_up.png"), (30, 30))
-    img_slime_what = pygame.transform.scale(load_image("enemy/slime/what.png"), (30, 30))
+class RageSlime(pygame.sprite.Sprite):
+    img_slime_jump = pygame.transform.scale(
+        load_image("enemy/slime_rage/jump.png"), (35, 35))
+    img_slime_down_air = pygame.transform.scale(
+        load_image("enemy/slime_rage/down.png"), (35, 35))
+    img_slime_down = pygame.transform.scale(
+        load_image("enemy/slime_rage/down_up.png"), (35, 35))
 
+    img_slime_what = pygame.transform.scale(
+        load_image("enemy/slime_rage/what.png"), (35, 35))
 
     def __init__(self, x, y, speed=5, *group):
         super().__init__(*group)
         self.speed = speed
         self.vel_y = 0
-        self.image = Slime.img_slime_down
+        self.image = RageSlime.img_slime_down
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = x, y
         self.jump = False
         self.in_air = False
         self.flip = False
         self.alive = True
-        self.hp = 100
-<<<<<<< HEAD
-        self.damage = 15
-=======
-        self.damage = 10
->>>>>>> fb41dcda16484580976a6911e9bee139bca42a00
+        self.hp = 200
+        self.damage = 30
         self.width = self.image.get_width()
         self.height = self.image.get_height()
         # зона поиска игрока
         self.x2, self.y2 = (500, 80)
-        self.contact = 0  # кадры контакта с игроком
 
         self.NN = 61
         self.player_flip = True
 
-<<<<<<< HEAD
-    def move(self, player, world,scroll, tolchok=0):
-=======
-
     def move(self, player, world, tolchok=0):
->>>>>>> fb41dcda16484580976a6911e9bee139bca42a00
         dx = 0
         dy = 0
         if self.NN >= 15:
@@ -70,7 +64,7 @@ class Slime(pygame.sprite.Sprite):
                     dx = self.speed
 
             if not self.in_air:
-                self.vel_y = -8
+                self.vel_y = -9
                 self.in_air = True
             self.vel_y += GRAVITY_SLIME
             dy += self.vel_y
@@ -80,7 +74,7 @@ class Slime(pygame.sprite.Sprite):
                 dx -= 8
             else:
                 dx += 8
-            dy += 1
+            dy += 1.5
             dy += GRAVITY_SLIME
 
         for tile in world.obstacle_list:
@@ -98,35 +92,25 @@ class Slime(pygame.sprite.Sprite):
                     self.vel_y = 0
                     self.in_air = False
                     dy = tile[1].top - self.rect.bottom
-
-
         if self.NN >= 15:
             if dy > GRAVITY_SLIME:
-                self.image = self.img_slime_down_air
+                self.image = RageSlime.img_slime_down_air
             elif dy < 0:
-                self.image = self.img_slime_jump
+                self.image = RageSlime.img_slime_jump
         else:
-            self.image = self.img_slime_what
+            self.image = RageSlime.img_slime_what
 
         self.rect.x += dx
         self.rect.y += dy
 
     def kick(self, player, world):
         self.NN = 0
-        self.hp -= random.randint(player.damage[0], player.damage[1])
+        self.hp -= player.damage
         self.player_flip = player.flip
         print(f'Слайм получил урон|{self.hp}')
         if self.hp <= 0:
             self.kill()
 
     def update(self, scroll):
-<<<<<<< Updated upstream
         self.rect.x -= scroll[0]
         self.rect.y -= scroll[1]
-=======
-        self.rect.x = scroll[0]
-        self.rect.y = scroll[1]
-
-
-
->>>>>>> Stashed changes
