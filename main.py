@@ -6,16 +6,22 @@ import csv
 from pygame.locals import *
 from load_image import load_image
 from player import Player
+<<<<<<< Updated upstream
 from camera import Camera
 from enemy import Enemy
+=======
+>>>>>>> Stashed changes
 from constants import *
 from slime import Slime
 from rage_slime import RageSlime
 
 moving_left = False
 moving_right = False
+<<<<<<< Updated upstream
 scroll_data = []
 scroll = [0, 0]
+=======
+>>>>>>> Stashed changes
 true_scroll = [0, 0]
 
 
@@ -29,13 +35,14 @@ for x in range(21):
 class World():
     def __init__(self):
         self.obstacle_list = []
-
+        self.img = 0
     def process_data(self, data):
         global player
         for y, row in enumerate(data):
             for x, tile in enumerate(row):
                 if tile >= 0:
                     img = img_list[tile]
+                    self.img = img
                     img_rect = img.get_rect()
                     img_rect.x = x * TILE_SIZE
                     img_rect.y = y * TILE_SIZE
@@ -47,7 +54,7 @@ class World():
                             img, x * TILE_SIZE, y * TILE_SIZE)
                         decoration_group.add(decoration)
                     elif tile == 15:
-                        player = Player(x * 38, y * 38, 5)
+                        player = Player(x * 38 , y * 38, 5)
                         slime = Slime(x * 38, y * 38, 2)
                         rage_slime = RageSlime(x * 38 + 10, y * 38, 2)
                         pass
@@ -62,10 +69,20 @@ class World():
 
         return player, slime, rage_slime
 
+<<<<<<< Updated upstream
     def draw(self, scroll_data):
         for tile in scroll_data:
 
             display.blit(tile[0], tile[1])
+=======
+    def draw(self, scroll):
+        obl = []
+        for tile in self.obstacle_list:
+            display.blit(tile[0], (tile[1][0] - scroll[0], tile[1][1] - scroll[1]))
+            tile_data = (self.img, pygame.Rect((tile[1][0] - scroll[0], tile[1][1] - scroll[1]),(self.img.get_width(), self.img.get_height())))
+            obl.append(tile_data)
+        self.obstacle_list = obl
+>>>>>>> Stashed changes
 
 
 class Decoration(pygame.sprite.Sprite):
@@ -79,7 +96,10 @@ class Decoration(pygame.sprite.Sprite):
 
 def draw_bg():
     display.fill((105, 193, 231))
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 
 def kick():
     kickTest = pygame.sprite.Sprite()
@@ -109,8 +129,13 @@ if __name__ == '__main__':
     font_debug = pygame.font.SysFont('sprites/8514fixr.fon', 50)
 
     clock = pygame.time.Clock()
+<<<<<<< Updated upstream
     screen = pygame.display.set_mode(SCREEN_SIZE, 0,32)
     display = pygame.Surface(DISPLAY_SIZE, 0,32)
+=======
+    screen = pygame.display.set_mode(SCREEN_SIZE)
+    display = pygame.Surface(DISPLAY_SIZE)
+>>>>>>> Stashed changes
 
     enemies = pygame.sprite.Group()
 
@@ -149,6 +174,7 @@ if __name__ == '__main__':
     camera = Camera()
 
     while running:
+<<<<<<< Updated upstream
 
 
         scroll_data = camera.obstacle_list(world, scroll)
@@ -160,11 +186,28 @@ if __name__ == '__main__':
 
         for enemy in enemies:
 
+=======
+        true_scroll[0] += (player.rect.x - true_scroll[0] - 661) / 20
+        true_scroll[1] += (player.rect.x - true_scroll[1] - 333) / 20
+        scroll = true_scroll.copy()
+        scroll[0] = int(true_scroll[0])
+        scroll[1] = int(true_scroll[1])
+
+
+        draw_bg()
+        world.draw(scroll)
+        player.draw(display)
+        debug_mode()
+
+        for enemy in slimes:
+            enemy.update(scroll)
+>>>>>>> Stashed changes
             if pygame.sprite.spritecollide(enemy, kicks, False):
                 enemy.kick(player, world)
 
             if pygame.sprite.spritecollide(enemy, players, False):
                 player.kick(enemy)
+<<<<<<< Updated upstream
             enemy.move(player, world)
             enemy.update(scroll)
         kicks.empty()
@@ -180,6 +223,17 @@ if __name__ == '__main__':
         scroll = true_scroll.copy()
         scroll[0], scroll[1] = int(scroll[0]), int(scroll[1])
 
+=======
+            enemy.move(player, world, scroll)
+        kicks.empty()
+
+
+        slimes.draw(display)
+
+        if player.alive:
+            player.move(moving_left, moving_right, world)
+            players.update(scroll)
+>>>>>>> Stashed changes
 
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -209,5 +263,7 @@ if __name__ == '__main__':
                     moving_right = False
         screen.blit(pygame.transform.scale(display, SCREEN_SIZE), (0, 0))
         clock.tick(FPS)
+        transf = pygame.transform.scale(display, SCREEN_SIZE)
+        screen.blit(transf, (0, 0))
         pygame.display.flip()
     pygame.quit()

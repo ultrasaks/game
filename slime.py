@@ -43,7 +43,7 @@ class Slime(pygame.sprite.Sprite):
         self.NN = 61
         self.player_flip = True
 
-    def move(self, player, world, tolchok=0):
+    def move(self, player, world,scroll, tolchok=0):
         dx = 0
         dy = 0
         if self.NN >= 15:
@@ -114,5 +114,13 @@ class Slime(pygame.sprite.Sprite):
             self.kill()
 
     def update(self, scroll):
+<<<<<<< Updated upstream
         self.rect.x -= scroll[0]
         self.rect.y -= scroll[1]
+=======
+        self.rect.x = scroll[0]
+        self.rect.y = scroll[1]
+
+
+
+>>>>>>> Stashed changes
