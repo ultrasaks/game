@@ -179,8 +179,9 @@ if __name__ == '__main__':
         kicks.empty()
 
         if player.alive:
+            player.update(scroll)
             player.move(moving_left, moving_right, scroll_data)
-        player.update(scroll)  # не поднимай вверх, оно должно быть и когда игрок не умер
+
 
         true_scroll[0] = (player.rect.center[0] - true_scroll[0] - A_scroll) // 15
         true_scroll[1] = (player.rect.center[1] - true_scroll[1] - B_scroll) // 15
@@ -192,26 +193,26 @@ if __name__ == '__main__':
                 running = False
             if event.type == KEYDOWN:
                 if player.alive:
-                    if event.key in [K_a]:
+                    if event.key in [K_a, K_LEFT]:
                         moving_left = True
-                    if event.key in [K_d]:
+                    if event.key in [K_d, K_RIGHT]:
                         moving_right = True
-                    if event.key in [K_w] and player.alive and (
+                    if event.key in [K_w, K_UP] and player.alive and (
                             not player.in_air or player.doubleJ):
                         if not player.in_air:
                             jump_sound.play()
                         else:
                             jump2_sound.play()
                         player.jump = True
-                    if event.key in [K_SPACE]:
+                    if event.key in [K_SPACE, K_DOWN]:
                         kick_sound.play()
                         kick()
                 if event.key in [K_ESCAPE]:
                     running = False
             if event.type == KEYUP:
-                if event.key in [K_a]:
+                if event.key in [K_a, K_LEFT]:
                     moving_left = False
-                if event.key in [K_d]:
+                if event.key in [K_d,K_RIGHT]:
                     moving_right = False
         screen.blit(pygame.transform.scale(display, SCREEN_SIZE), (0, 0))
         clock.tick(FPS)

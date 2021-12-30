@@ -20,7 +20,7 @@ class Slime(pygame.sprite.Sprite):
 
     def __init__(self, x, y, speed=5, *group):
         super().__init__(*group)
-        self.speed = speed
+        self.speed = speed + 3
         self.vel_y = 0
         self.image = Slime.img_slime_down
         self.rect = self.image.get_rect()
@@ -73,8 +73,8 @@ class Slime(pygame.sprite.Sprite):
                 dx -= 8
             else:
                 dx += 8
-            dy += 1
-            dy += GRAVITY_SLIME
+            self.vel_y += 1
+            dy += GRAVITY_SLIME + 1
 
         for tile in world:
             # check collision in the x direction

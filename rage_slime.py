@@ -75,8 +75,8 @@ class RageSlime(pygame.sprite.Sprite):
                 dx -= 8
             else:
                 dx += 8
-            dy += 1.5
-            dy += GRAVITY_SLIME
+            self.vel_y += 1.5
+            dy += GRAVITY_SLIME + 1.5
 
         for tile in world:
             # check collision in the x direction
