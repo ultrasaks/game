@@ -178,9 +178,10 @@ if __name__ == '__main__':
 
         kicks.empty()
 
+        player.update(scroll)  # не поднимай вверх, оно должно быть и когда игрок не умер
         if player.alive:
             player.move(moving_left, moving_right, scroll_data)
-        player.update(scroll)  # не поднимай вверх, оно должно быть и когда игрок не умер
+
 
         true_scroll[0] = (player.rect.center[0] - true_scroll[0] - A_scroll) // 15
         true_scroll[1] = (player.rect.center[1] - true_scroll[1] - B_scroll) // 15
