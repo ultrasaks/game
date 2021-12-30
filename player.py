@@ -12,6 +12,8 @@ class Player(pygame.sprite.Sprite):
     jumpSprite = load_image('test_sprite_jump.png')
     fallSprite = load_image('test_sprite_fall.png')
     kickSprite = load_image('test_sprite_kick.png')
+    # kickSprite.set_colorkey((255, 0, 0))
+
 
     def __init__(self, x, y, speed=5, *group):
         super().__init__(*group)
@@ -26,18 +28,22 @@ class Player(pygame.sprite.Sprite):
         self.alive = True
         self.doubleJ = False
         self.defence = 0  # потом
-        self.damage = 20  # потом
+        self.damage = 15, 30
         self.hp = 100  # потом
         self.width = self.image.get_width()
         self.height = self.image.get_height()
         self.spriteN = 0
         self.spriteRun = False
         self.isKick = 0
+        self.delay = 0
+
 
     def move(self, moving_left, moving_right, world):
         # движение за этот ход
         dx = 0
         dy = 0
+        if self.delay > 0:
+            self.delay -= 1
 
         if moving_left:
             dx = -self.speed
@@ -68,7 +74,7 @@ class Player(pygame.sprite.Sprite):
             self.image = self.baseSprite
 
         if self.jump and not self.in_air:  # прыжок
-            self.vel_y = -11
+            self.vel_y = -12
             self.jump = False
             self.doubleJ = True
             self.in_air = True
@@ -81,12 +87,12 @@ class Player(pygame.sprite.Sprite):
         self.vel_y += GRAVITY
         dy += self.vel_y
 
-        for tile in world.obstacle_list:
+        for tile in world:
             # check collision in the x direction
             if tile[1].colliderect(self.rect.x + dx, self.rect.y, self.width, self.height):
                 dx = 0
             # check for collision in the y direction
-            if tile[1].colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
+            if tile[1].colliderect(self.rect.x , self.rect.y + dy, self.width, self.height):
                 # check if below the ground, i.e. jumping
                 if self.vel_y < 0:
                     self.vel_y = 0
@@ -105,36 +111,42 @@ class Player(pygame.sprite.Sprite):
             self.image = self.jumpSprite
 
         if self.isKick > 0:
+            # self.image = self.colorImage
             self.image = self.kickSprite
             self.isKick -= 1
 
         self.rect.x += dx
         self.rect.y += dy
         scroll_x, scroll_y = 0, 0
-        if (self.rect.right > SCREEN_SIZE[0] - 350) \
-                or (self.rect.left < 350):
-            self.rect.x -= dx
-            scroll_x = -dx
+        # if (self.rect.right > SCREEN_SIZE[0] - 350) \
+        #         or (self.rect.left < 350):
+        #     self.rect.x -= dx
+        #     scroll_x = -dx
         # БАГИ БАГИ БАГИ!!!
         # if (self.rect.bottom > SCREEN_SIZE[1] - 200) \
         #         or (self.rect.bottom < 200):
         #     if self.rect.bottom < 200:
-        #         if dy == 0.75:
-        #             dy = 2
-        #         self.rect.y = math.fabs(dy)
+        #         self.rect.y += math.fabs(dy)
         #         scroll_y = math.fabs(dy)
         #     else:
-        #         if dy == 0.75:
-        #             dy = 2
         #         self.rect.y -= math.fabs(dy)
         #         scroll_y = -math.fabs(dy)
-        #     print(scroll_y, dy)
+        #     print(self.rect.bottom, dy, scroll_y)
         return scroll_x, scroll_y
 
-    def kick(self, slime):
-        self.hp -= slime.damage
+
+    def kick(self, enemy):
+        if self.delay == 0:
+            self.hp -= enemy.damage
+            self.delay = 50
+        if self.hp <= 0:
+            self.alive = False
         # print("Герой крыс получил урон")
 
-    def draw(self, screen):
-        screen.blit(pygame.transform.flip(
+    def draw(self, display):
+        display.blit(pygame.transform.flip(
             self.image, self.flip, False), self.rect)
+
+    def update(self, scroll):
+        self.rect.x -= scroll[0]
+        self.rect.y -= scroll[1]
