@@ -33,7 +33,7 @@ class RageSlime(pygame.sprite.Sprite):
         self.in_air = False
         self.flip = False
         self.alive = True
-        self.hp = 200
+        self.hp = 150
         self.damage = 20
         self.width = self.image.get_width()
         self.height = self.image.get_height()
@@ -78,7 +78,7 @@ class RageSlime(pygame.sprite.Sprite):
             dy += 1.5
             dy += GRAVITY_SLIME
 
-        for tile in world.obstacle_list:
+        for tile in world:
             # check collision in the x direction
             if tile[1].colliderect(self.rect.x + dx, self.rect.y, self.width, self.height):
                 dx = 0
@@ -104,7 +104,7 @@ class RageSlime(pygame.sprite.Sprite):
         self.rect.x += dx
         self.rect.y += dy
 
-    def kick(self, player, world):
+    def kick(self, player):
         self.NN = 0
         self.hp -= random.randint(player.damage[0], player.damage[1])
         self.player_flip = player.flip

@@ -30,7 +30,6 @@ class Slime(pygame.sprite.Sprite):
         self.flip = False
         self.alive = True
         self.hp = 100
-        self.contact = 0
 
         self.damage = 15
 
@@ -77,7 +76,7 @@ class Slime(pygame.sprite.Sprite):
             dy += 1
             dy += GRAVITY_SLIME
 
-        for tile in world.obstacle_list:
+        for tile in world:
             # check collision in the x direction
             if tile[1].colliderect(self.rect.x + dx, self.rect.y, self.width, self.height):
                 dx = 0
@@ -105,7 +104,7 @@ class Slime(pygame.sprite.Sprite):
         self.rect.x += dx
         self.rect.y += dy
 
-    def kick(self, player, world):
+    def kick(self, player):
         self.NN = 0
         self.hp -= random.randint(player.damage[0], player.damage[1])
         self.player_flip = player.flip
@@ -114,9 +113,6 @@ class Slime(pygame.sprite.Sprite):
             self.kill()
 
     def update(self, scroll):
-
         self.rect.x -= scroll[0]
         self.rect.y -= scroll[1]
-
-
 
