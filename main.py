@@ -108,9 +108,9 @@ def debug_mode():
     display.blit(textsurface, (210, 0))
 
 
-def draw_hp(player):
+def draw_hp(player, color_hp=(21, 143, 26)):
     pygame.draw.rect(display, (215, 24, 44), (player.rect.center[0] - 25,player.rect.y - 10, 50, 5))
-    pygame.draw.rect(display, (21, 143, 26), (player.rect.center[0] - 25,player.rect.y - 10, player.hp * 0.5, 5))
+    pygame.draw.rect(display, color_hp, (player.rect.center[0] - 25,player.rect.y - 10, player.hp * 0.5, 5))
 
 
 if __name__ == '__main__':
@@ -176,8 +176,17 @@ if __name__ == '__main__':
     eventer = ""
 
     abilityy = Ability()
+
+    color_hp = (21, 143, 26)
     while running:
         if not pause:
+            a = 0
+            for i in abilities_group:
+                a = i.default()
+            if not a:
+                color_hp = (21, 143, 26)
+            else:
+                color_hp = (20, 30, 255)
             scroll_data = camera.obstacle_list(world, scroll)
             draw_bg()
             decoration_mobs.draw(display)
@@ -187,7 +196,7 @@ if __name__ == '__main__':
             enemies.draw(display)
             player.draw(display)
             abilities_group.draw(display)
-            draw_hp(player)
+            draw_hp(player, color_hp)
 
             debug_mode()
             for mob in decoration_mobs:
@@ -203,8 +212,12 @@ if __name__ == '__main__':
 
                 if pygame.sprite.spritecollide(enemy, players, False):
                     if enemy.contact == 5:
-                        player.kick(enemy)
-                        enemy.contact = 0
+                        if not a:
+                            color_hp = (21, 143, 26)
+                            player.kick(enemy)
+                            enemy.contact = 0
+                        else:
+                            color_hp = (20, 30, 255)
                     enemy.contact += 1
                 else:
                     enemy.contact = 0
@@ -228,6 +241,8 @@ if __name__ == '__main__':
             scroll = true_scroll.copy()
             scroll[0], scroll[1] = int(scroll[0]), int(scroll[1])
         else:
+            moving_left = False
+            moving_right = False
             draw_bg()
             decoration_mobs.draw(display)
             world.draw(scroll_data)
@@ -237,10 +252,7 @@ if __name__ == '__main__':
             player.draw(display)
             abilities_group.draw(display)
             draw_hp(player)
-            if pygame.mouse.get_focused():
 
-                sprite.rect.x, sprite.rect.y = pygame.mouse.get_pos()
-                all_sprites.draw(display)
             if eventer == "ability":
                 a = abilityy.update(player)
                 if a == 0:
@@ -249,6 +261,10 @@ if __name__ == '__main__':
                 else:
                     abilities_group.add(a)
                     pause = False
+            if pygame.mouse.get_focused():
+
+                sprite.rect.x, sprite.rect.y = pygame.mouse.get_pos()
+                all_sprites.draw(display)
 
 
         for event in pygame.event.get():

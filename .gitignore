@@ -2,3 +2,5 @@
 /.idea/
 /__pycache__/
 __pycache__/slime.cpython-39.pyc
+*.pyc
+__pycache__/player.cpython-39.pyc

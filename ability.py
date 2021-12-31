@@ -5,7 +5,7 @@ from constants import *
 
 class Shield(pygame.sprite.Sprite):
     image_shield = pygame.transform.scale(load_image("abilities/ability111.png"), (60, 60))
-    image_shield2 = pygame.transform.scale(load_image("abilities/ability110.png"), (30, 30))
+    image_shield2 = pygame.transform.scale(load_image("abilities/ability110.png"), (40, 40))
     def __init__(self,player, *group):
         super().__init__(*group)
         self.image2 = Shield.image_shield2
@@ -38,16 +38,18 @@ class Shield(pygame.sprite.Sprite):
             self.kill()
     def update(self, scroll):
         pass
-class Braid(pygame.sprite.Sprite):
-    image_braid_right = pygame.transform.scale(load_image("abilities/ability 000.png"), (60, 60))
-    image_braid_left = pygame.transform.scale(load_image("abilities/ability 001.png"), (60, 60))
+    def default(self):
+        return True
+class Sword(pygame.sprite.Sprite):
+    image_sword_right = pygame.transform.scale(load_image("abilities/ability000.png"), (60, 60))
+    image_sword_left = pygame.transform.scale(load_image("abilities/ability001.png"), (60, 60))
     def __init__(self, player, *group):
         super().__init__(*group)
         if player.flip is False:
-            self.image = Braid.image_braid_right
+            self.image = Sword.image_sword_right
             self.speed = 15
         else:
-            self.image = Braid.image_braid_left
+            self.image = Sword.image_sword_left
             self.speed = -15
         self.flip = player.flip
 
@@ -79,9 +81,13 @@ class Braid(pygame.sprite.Sprite):
         if self.NN >= 30:
             self.kill()
 
+    def default(self):
+        return False
+
 class Ability():
     def __init__(self):
         self.display = pygame.Surface(DISPLAY_SIZE)
+        self.background = pygame.transform.scale(load_image("abilities/background_dop.png"), DISPLAY_SIZE).convert_alpha()
         self.image00 = pygame.transform.scale(load_image("abilities/ability00.png"), (256 / 2, 384 / 2)).convert_alpha()
         self.image01 = pygame.transform.scale(load_image("abilities/ability01.png"), (256 / 2, 384 / 2)).convert_alpha()
         self.image10 = pygame.transform.scale(load_image("abilities/ability10.png"), (256 / 2, 384 / 2)).convert_alpha()
@@ -91,7 +97,7 @@ class Ability():
         self.rect1 = self.image1.get_rect()
         self.rect2 = self.image2.get_rect()
         self.rect1.x, self.rect1.y = (DISPLAY_SIZE[0] // 2 // 2, DISPLAY_SIZE[1] // 2 // 2 )
-        self.rect2.x, self.rect2.y = (self.rect1.x + 150, DISPLAY_SIZE[1] // 2 // 2)
+        self.rect2.x, self.rect2.y = (self.rect1.x + 300, DISPLAY_SIZE[1] // 2 // 2)
 
     def update(self,player):
         ability = 0
@@ -99,7 +105,7 @@ class Ability():
             self.image1 = self.image01
             for i in pygame.event.get():
                 if i.type == MOUSEBUTTONDOWN:
-                    ability = Braid(player)
+                    ability = Sword(player)
         else:
             self.image1 = self.image00
         if self.rect2.collidepoint(pygame.mouse.get_pos()):
@@ -112,5 +118,6 @@ class Ability():
         return ability
 
     def draw(self, display):
+        display.blit(self.background, (0, 0))
         display.blit(self.image1, self.rect1)
         display.blit(self.image2, self.rect2)
