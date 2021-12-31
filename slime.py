@@ -30,7 +30,7 @@ class Slime(pygame.sprite.Sprite):
         self.flip = False
         self.alive = True
         self.hp = 100
-
+        self.flips = False
         self.damage = 15
 
         self.width = self.image.get_width()
@@ -55,10 +55,12 @@ class Slime(pygame.sprite.Sprite):
 
             if player.rect.x + 5 < self.rect.x and (x - self.x2, y - self.y2) < player.rect.center < (
                     x + self.x2, y + self.y2):
+                self.flips = True
                 if self.in_air:
                     dx = -self.speed
             elif player.rect.x - 5 > self.rect.x and (x - self.x2, y - self.y2) < player.rect.center < (
                     x + self.x2, y + self.y2):
+                self.flips = True
                 if self.in_air:
                     dx = self.speed
 
@@ -108,6 +110,13 @@ class Slime(pygame.sprite.Sprite):
         self.NN = 0
         self.hp -= random.randint(player.damage[0], player.damage[1])
         self.player_flip = player.flip
+        print(f'Слайм получил урон|{self.hp}')
+        if self.hp <= 0:
+            self.kill()
+    def kicks(self, player):
+        self.NN = 0
+        self.hp -= random.choice(player)
+        self.flip = self.flips
         print(f'Слайм получил урон|{self.hp}')
         if self.hp <= 0:
             self.kill()

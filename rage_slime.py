@@ -111,6 +111,13 @@ class RageSlime(pygame.sprite.Sprite):
         print(f'Слайм получил урон|{self.hp}')
         if self.hp <= 0:
             self.kill()
+    def kicks(self, player):
+        self.NN = 0
+        self.hp -= random.choice(player)
+        self.flip = False
+        print(f'Слайм получил урон|{self.hp}')
+        if self.hp <= 0:
+            self.kill()
 
     def update(self, scroll):
         self.rect.x -= scroll[0]

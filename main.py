@@ -6,18 +6,24 @@ import csv
 
 
 from pygame.locals import *
+
+import ability
 from load_image import load_image
 from player import Player
 from camera import Camera
 from constants import *
+from bird import Bird
 from slime import Slime
 from rage_slime import RageSlime
+from ability import Ability
 
 moving_left = False
 moving_right = False
 scroll_data = []
 scroll = [0, 0]
 true_scroll = [0, 0]
+
+
 
 
 img_list = []
@@ -102,9 +108,9 @@ def debug_mode():
     display.blit(textsurface, (210, 0))
 
 
-def draw_hp():
-    pygame.draw.rect(display, (215, 24, 44), (0, 0, 200, 30))
-    pygame.draw.rect(display, (21, 143, 26), (0, 0, player.hp * 2, 30))
+def draw_hp(player):
+    pygame.draw.rect(display, (215, 24, 44), (player.rect.center[0] - 25,player.rect.y - 10, 50, 5))
+    pygame.draw.rect(display, (21, 143, 26), (player.rect.center[0] - 25,player.rect.y - 10, player.hp * 0.5, 5))
 
 
 if __name__ == '__main__':
@@ -118,7 +124,7 @@ if __name__ == '__main__':
     screen = pygame.display.set_mode(SCREEN_SIZE, 0,32)
     display = pygame.Surface(DISPLAY_SIZE, 0,32)
 
-    enemies = pygame.sprite.Group()
+
 
     kick_sound = pygame.mixer.Sound("sounds/kick.wav")
     jump_sound = pygame.mixer.Sound("sounds/jump.wav")
@@ -132,6 +138,18 @@ if __name__ == '__main__':
     kicks = pygame.sprite.Group()
     players = pygame.sprite.Group()
     decoration_group = pygame.sprite.Group()
+    enemies = pygame.sprite.Group()
+    decoration_mobs = pygame.sprite.Group()
+    abilities_group = pygame.sprite.Group()
+
+    all_sprites = pygame.sprite.Group()
+    sprite = pygame.sprite.Sprite()
+    image = pygame.transform.scale(load_image("enemy/slime/jump.png"), (15, 15))
+    sprite.image = image
+    sprite.rect = image.get_rect()
+    all_sprites.add(sprite)
+    pygame.mouse.set_visible(False)
+
 
     world_data = []
     with open(f'levels/level1_data.csv', newline='') as csvfile:
@@ -149,44 +167,78 @@ if __name__ == '__main__':
                 world_data[x][y] = int(tile)
     world = World()
     player = world.process_data(world_data)
-
+    for i in range(50):
+        bird = Bird(random.randint(50, 2000), random.randint(-6000, 0))
+        decoration_mobs.add(bird)
     players.add(player)
     camera = Camera()
+    pause = False
+    eventer = ""
 
+    abilityy = Ability()
     while running:
-        scroll_data = camera.obstacle_list(world, scroll)
-        draw_bg()
-        world.draw(scroll_data)
-        enemies.draw(display)
-        player.draw(display)
-        draw_hp()
+        if not pause:
+            scroll_data = camera.obstacle_list(world, scroll)
+            draw_bg()
+            decoration_mobs.draw(display)
+            world.draw(scroll_data)
+            for i in abilities_group:
+                i.draw2(display)
+            enemies.draw(display)
+            player.draw(display)
+            abilities_group.draw(display)
+            draw_hp(player)
 
-        debug_mode()
-        for enemy in enemies:
-            if pygame.sprite.spritecollide(enemy, kicks, False):
-                enemy.kick(player)
+            debug_mode()
+            for mob in decoration_mobs:
+                mob.update(scroll)
+                mob.move()
 
-            if pygame.sprite.spritecollide(enemy, players, False):
-                if enemy.contact == 5:
-                    player.kick(enemy)
+
+            for enemy in enemies:
+                for i in abilities_group:
+                    i.kick(enemy)
+                if pygame.sprite.spritecollide(enemy, kicks, False):
+                    enemy.kick(player)
+
+                if pygame.sprite.spritecollide(enemy, players, False):
+                    if enemy.contact == 5:
+                        player.kick(enemy)
+                        enemy.contact = 0
+                    enemy.contact += 1
+                else:
                     enemy.contact = 0
-                enemy.contact += 1
-            else:
-                enemy.contact = 0
-            enemy.update(scroll)
-            enemy.move(player, scroll_data)
+                enemy.update(scroll)
+                enemy.move(player, scroll_data)
 
-        kicks.empty()
+            kicks.empty()
 
-        if player.alive:
-            player.update(scroll)
-            player.move(moving_left, moving_right, scroll_data)
+            if player.alive:
+                player.update(scroll)
+                player.move(moving_left, moving_right, scroll_data)
+            for i in abilities_group:
+                i.move(player, scroll)
+                i.clocker()
 
 
-        true_scroll[0] = (player.rect.center[0] - true_scroll[0] - A_scroll) // 15
-        true_scroll[1] = (player.rect.center[1] - true_scroll[1] - B_scroll) // 15
-        scroll = true_scroll.copy()
-        scroll[0], scroll[1] = int(scroll[0]), int(scroll[1])
+
+            true_scroll[0] = (player.rect.center[0] - true_scroll[0] - A_scroll) // 15
+            true_scroll[1] = (player.rect.center[1] - true_scroll[1] - B_scroll) // 15
+            scroll = true_scroll.copy()
+            scroll[0], scroll[1] = int(scroll[0]), int(scroll[1])
+        else:
+            display.fill((0 , 0 , 0))
+            if pygame.mouse.get_focused():
+                sprite.rect.x, sprite.rect.y = pygame.mouse.get_pos()
+                all_sprites.draw(display)
+            if eventer == "ability":
+                a = abilityy.update(player)
+                if a == 0:
+                    abilityy.draw(display)
+                else:
+                    abilities_group.add(a)
+                    pause = False
+
 
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -209,11 +261,15 @@ if __name__ == '__main__':
                         kick()
                 if event.key in [K_ESCAPE]:
                     running = False
+                if event.key == K_TAB:
+                    pause = True
+                    eventer = "ability"
             if event.type == KEYUP:
                 if event.key in [K_a, K_LEFT]:
                     moving_left = False
-                if event.key in [K_d,K_RIGHT]:
+                if event.key in [K_d, K_RIGHT]:
                     moving_right = False
+
         screen.blit(pygame.transform.scale(display, SCREEN_SIZE), (0, 0))
         clock.tick(FPS)
         pygame.display.flip()
