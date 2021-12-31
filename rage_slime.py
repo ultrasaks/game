@@ -110,6 +110,7 @@ class RageSlime(pygame.sprite.Sprite):
         self.player_flip = player.flip
         print(f'Слайм получил урон|{self.hp}')
         if self.hp <= 0:
+            player.mana_count += 3
             self.kill()
     def kicks(self, player):
         self.NN = 0
@@ -117,6 +118,7 @@ class RageSlime(pygame.sprite.Sprite):
         self.flip = False
         print(f'Слайм получил урон|{self.hp}')
         if self.hp <= 0:
+
             self.kill()
 
     def update(self, scroll):

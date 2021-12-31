@@ -112,6 +112,7 @@ class Slime(pygame.sprite.Sprite):
         self.player_flip = player.flip
         print(f'Слайм получил урон|{self.hp}')
         if self.hp <= 0:
+            player.mana_count += 1
             self.kill()
     def kicks(self, player):
         self.NN = 0

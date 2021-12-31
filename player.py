@@ -29,6 +29,8 @@ class Player(pygame.sprite.Sprite):
         self.doubleJ = False
         self.defence = 0  # потом
         self.damage = [15, 30]
+        self.mana = True
+        self.mana_count = 0
         self.hp = 100  # потом
         self.width = self.image.get_width()
         self.height = self.image.get_height()
@@ -144,6 +146,9 @@ class Player(pygame.sprite.Sprite):
         # print("Герой крыс получил урон")
 
     def draw(self, display):
+        if self.mana_count >= 10:
+            self.mana = True
+            self.mana_count = 0
         display.blit(pygame.transform.flip(
             self.image, self.flip, False), self.rect)
 

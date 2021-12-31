@@ -99,13 +99,15 @@ class Ability():
         self.rect1.x, self.rect1.y = (DISPLAY_SIZE[0] // 2 // 2, DISPLAY_SIZE[1] // 2 // 2 )
         self.rect2.x, self.rect2.y = (self.rect1.x + 300, DISPLAY_SIZE[1] // 2 // 2)
 
-    def update(self,player):
+    def update(self,player, ui):
         ability = 0
         if self.rect1.collidepoint(pygame.mouse.get_pos()):
             self.image1 = self.image01
             for i in pygame.event.get():
                 if i.type == MOUSEBUTTONDOWN:
                     ability = Sword(player)
+                    player.mana = False
+                    ui.NN = 0
         else:
             self.image1 = self.image00
         if self.rect2.collidepoint(pygame.mouse.get_pos()):
@@ -113,6 +115,8 @@ class Ability():
             for i in pygame.event.get():
                 if i.type == MOUSEBUTTONDOWN:
                     ability = Shield(player)
+                    player.mana = False
+                    ui.NN = 0
         else:
             self.image2 = self.image10
         return ability

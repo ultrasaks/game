@@ -3,7 +3,7 @@ import os
 import sys
 import random
 import csv
-
+from UI import UI
 
 from pygame.locals import *
 
@@ -102,15 +102,10 @@ def kick():
     player.isKick = 7
 
 
-def debug_mode():
-    kicks.draw(display)
-    textsurface = font_debug.render(str(round(clock.get_fps())), False, (255, 255, 0))
-    display.blit(textsurface, (210, 0))
 
 
-def draw_hp(player, color_hp=(21, 143, 26)):
-    pygame.draw.rect(display, (215, 24, 44), (player.rect.center[0] - 25,player.rect.y - 10, 50, 5))
-    pygame.draw.rect(display, color_hp, (player.rect.center[0] - 25,player.rect.y - 10, player.hp * 0.5, 5))
+
+
 
 
 if __name__ == '__main__':
@@ -172,6 +167,7 @@ if __name__ == '__main__':
         decoration_mobs.add(bird)
     players.add(player)
     camera = Camera()
+    ui = UI()
     pause = False
     eventer = ""
 
@@ -196,9 +192,10 @@ if __name__ == '__main__':
             enemies.draw(display)
             player.draw(display)
             abilities_group.draw(display)
-            draw_hp(player, color_hp)
+            ui.draw_hp(player, display,color_hp)
+            ui.draw_mana(display, player)
 
-            debug_mode()
+            ui.debug_mode(font_debug, display, kicks, clock)
             for mob in decoration_mobs:
                 mob.update(scroll)
                 mob.move()
@@ -251,10 +248,10 @@ if __name__ == '__main__':
             enemies.draw(display)
             player.draw(display)
             abilities_group.draw(display)
-            draw_hp(player)
-
+            ui.draw_hp(player, display, color_hp)
+            ui.draw_mana(display, player)
             if eventer == "ability":
-                a = abilityy.update(player)
+                a = abilityy.update(player, ui)
                 if a == 0:
 
                     abilityy.draw(display)
@@ -288,14 +285,18 @@ if __name__ == '__main__':
                         kick()
                 if event.key in [K_ESCAPE]:
                     running = False
-                if event.key == K_TAB:
-                    pause = True
-                    eventer = "ability"
+                if event.key in [K_TAB]:
+                    if player.mana:
+                        pause = True
+                        eventer = "ability"
             if event.type == KEYUP:
                 if event.key in [K_a, K_LEFT]:
                     moving_left = False
                 if event.key in [K_d, K_RIGHT]:
                     moving_right = False
+                if event.key in [K_TAB]:
+                    pause = False
+                    eventer = ""
 
         screen.blit(pygame.transform.scale(display, SCREEN_SIZE), (0, 0))
         clock.tick(FPS)
