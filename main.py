@@ -217,6 +217,7 @@ if __name__ == '__main__':
                 player.update(scroll)
                 player.move(moving_left, moving_right, scroll_data)
             for i in abilities_group:
+                i.update(scroll)
                 i.move(player, scroll)
                 i.clocker()
 
@@ -227,13 +228,23 @@ if __name__ == '__main__':
             scroll = true_scroll.copy()
             scroll[0], scroll[1] = int(scroll[0]), int(scroll[1])
         else:
-            display.fill((0 , 0 , 0))
+            draw_bg()
+            decoration_mobs.draw(display)
+            world.draw(scroll_data)
+            for i in abilities_group:
+                i.draw2(display)
+            enemies.draw(display)
+            player.draw(display)
+            abilities_group.draw(display)
+            draw_hp(player)
             if pygame.mouse.get_focused():
+
                 sprite.rect.x, sprite.rect.y = pygame.mouse.get_pos()
                 all_sprites.draw(display)
             if eventer == "ability":
                 a = abilityy.update(player)
                 if a == 0:
+
                     abilityy.draw(display)
                 else:
                     abilities_group.add(a)

@@ -36,35 +36,39 @@ class Shield(pygame.sprite.Sprite):
         self.NN += 1
         if self.NN >= 480:
             self.kill()
-
+    def update(self, scroll):
+        pass
 class Braid(pygame.sprite.Sprite):
-    image_braid = pygame.transform.scale(load_image("abilities/ability0.png"), (60, 60))
-
+    image_braid_right = pygame.transform.scale(load_image("abilities/ability 000.png"), (60, 60))
+    image_braid_left = pygame.transform.scale(load_image("abilities/ability 001.png"), (60, 60))
     def __init__(self, player, *group):
         super().__init__(*group)
-        self.image = Braid.image_braid
+        if player.flip is False:
+            self.image = Braid.image_braid_right
+            self.speed = 15
+        else:
+            self.image = Braid.image_braid_left
+            self.speed = -15
+        self.flip = player.flip
+
         self.rect = self.image.get_rect()
         self.rect.center = player.rect.center
         self.mask = pygame.mask.from_surface(self.image)
         self.damage = [300, 200, 250, 350, 500, 100, 1]
         self.true = True
-        self.flip = False
         self.NN = 0
-        self.rect.y = player.rect.y
     def move(self, player, scroll):
-        self.image = pygame.transform.rotate(self.image, 15)
-        if self.flip is False:
-            dx = 15
-        else:
-            dx = -15
-        dy = 0
-        self.rect.x += dx - scroll[0]
-        self.rect.y += dy - scroll[1]
+        dx = self.speed
+        self.rect.x += dx
+
 
     def draw(self, display):
         display.blit(self.image, self.rect)
     def draw2(self, display):
         pass
+    def update(self, scroll):
+        self.rect.x -= scroll[0]
+        self.rect.y -= scroll[1]
 
     def kick(self, mobs):
         if pygame.sprite.collide_mask(self, mobs):
@@ -72,7 +76,7 @@ class Braid(pygame.sprite.Sprite):
             self.kill()
     def clocker(self):
         self.NN += 1
-        if self.NN >= 240:
+        if self.NN >= 30:
             self.kill()
 
 class Ability():
