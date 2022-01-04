@@ -1,7 +1,7 @@
 import pygame
 
 
-class Camera():
+class Camera:
     def __init__(self):
         self.scroll = [0, 0]
         self.obstacle = []
