@@ -4,7 +4,6 @@ import sys
 import random
 import csv
 
-
 from pygame.locals import *
 from load_image import load_image
 from player import Player
@@ -12,6 +11,9 @@ from camera import Camera
 from constants import *
 from slime import Slime
 from rage_slime import RageSlime
+from decor import Decor
+from world import World
+from pickup import Pickup
 
 moving_left = False
 moving_right = False
@@ -25,58 +27,6 @@ for x in range(21):
     img = load_image(f'tiles/{x}.png')
     img = pygame.transform.scale(img, (TILE_SIZE, TILE_SIZE))
     img_list.append(img)
-
-
-class World:
-    def __init__(self):
-        self.obstacle_list = []
-
-    def process_data(self, data):
-        global player
-        for y, row in enumerate(data):
-            for x, tile in enumerate(row):
-                if tile >= 0:
-                    img = img_list[tile]
-                    img_rect = img.get_rect()
-                    img_rect.x = x * TILE_SIZE
-                    img_rect.y = y * TILE_SIZE
-                    tile_data = (img, img_rect)
-                    if 0 <= tile <= 8:
-                        self.obstacle_list.append(tile_data)
-                    elif 11 <= tile <= 14:
-                        decoration = Decoration(
-                            img, x * TILE_SIZE, y * TILE_SIZE)
-                        decoration_group.add(decoration)
-                    elif tile == 15:
-                        player = Player(x * 38, y * 38, 5)
-
-                        pass
-                    elif tile == 16:
-                        slime = Slime(x * 38, y * 38, 2)
-                        rage_slime = RageSlime(x * 38 + 10, y * 38, 2)
-                        enemies.add(slime)
-                        enemies.add(rage_slime)
-                        pass
-                    elif tile == 20:
-                        # exit = Exit(img, x * TILE_SIZE, y * TILE_SIZE)
-                        # exit_group.add(exit)
-                        pass
-
-        return player
-
-    def draw(self, scroll_data):
-        for tile in scroll_data:
-
-            display.blit(tile[0], tile[1])
-
-
-class Decoration(pygame.sprite.Sprite):
-    def __init__(self, img, x, y):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = img
-        self.rect = self.image.get_rect()
-        self.rect.midtop = (x + TILE_SIZE // 2, y +
-                            (TILE_SIZE - self.image.get_height()))
 
 
 def draw_bg():
@@ -131,10 +81,11 @@ if __name__ == '__main__':
     running = True
     kicks = pygame.sprite.Group()
     players = pygame.sprite.Group()
-    decoration_group = pygame.sprite.Group()
+    decorations = Decor()
+    pickups = Pickup()
 
     world_data = []
-    with open(f'levels/level1_data.csv', newline='') as csvfile:
+    with open(f'levels/level.csv', newline='') as csvfile:
         reader = csv.reader(csvfile, delimiter=',')
         readerData = [row for row in reader]
 
@@ -147,21 +98,25 @@ if __name__ == '__main__':
         for x, row in enumerate(readerData):
             for y, tile in enumerate(row):
                 world_data[x][y] = int(tile)
-    world = World()
-    player = world.process_data(world_data)
+    world = World(img_list)
+    player = world.process_data(world_data, decorations, enemies, pickups)
 
     players.add(player)
     camera = Camera()
 
     while running:
-        scroll_data = camera.obstacle_list(world, scroll)
+        scroll_data = camera.obstacle_list(world, scroll, decorations, pickups)
         draw_bg()
-        world.draw(scroll_data)
+        world.draw(display, scroll_data)
+        decorations.decoration_group.draw(display)
+        pickups.pickups_group.draw(display)
+
         enemies.draw(display)
         player.draw(display)
-        draw_hp()
 
-        debug_mode()
+        draw_hp()
+        # debug_mode()
+
         for enemy in enemies:
             if pygame.sprite.spritecollide(enemy, kicks, False):
                 enemy.kick(player)
@@ -176,12 +131,16 @@ if __name__ == '__main__':
             enemy.update(scroll)
             enemy.move(player, scroll_data)
 
+        if pygame.sprite.spritecollide(player, pickups.pickups_group, False):
+            for pickup in pickups.pickups_group:
+                if pygame.sprite.spritecollide(pickup, players, False):
+                    pickup.touch(player)
+
         kicks.empty()
 
-        player.update(scroll)  # не поднимай вверх, оно должно быть и когда игрок не умер
+        player.update(scroll)
         if player.alive:
             player.move(moving_left, moving_right, scroll_data)
-
 
         true_scroll[0] = (player.rect.center[0] - true_scroll[0] - A_scroll) // 15
         true_scroll[1] = (player.rect.center[1] - true_scroll[1] - B_scroll) // 15
@@ -214,6 +173,7 @@ if __name__ == '__main__':
                     moving_left = False
                 if event.key in [K_d]:
                     moving_right = False
+
         screen.blit(pygame.transform.scale(display, SCREEN_SIZE), (0, 0))
         clock.tick(FPS)
         pygame.display.flip()
