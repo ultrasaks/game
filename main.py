@@ -8,13 +8,12 @@ from UI import UI
 from pygame.locals import *
 
 import ability
-from load_image import load_image
+from Utilities.load_image import load_image
 from player import Player
-from camera import Camera
-from constants import *
+from Utilities.camera import Camera
+from Utilities.constants import *
 from bird import Bird
-from slime import Slime
-from rage_slime import RageSlime
+
 from ability import Ability
 from decor import Decor
 from world import World

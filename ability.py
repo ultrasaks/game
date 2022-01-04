@@ -1,12 +1,14 @@
 import pygame
-from load_image import load_image
+from Utilities.load_image import load_image
 from pygame.locals import *
-from constants import *
+from Utilities.constants import *
+
 
 class Shield(pygame.sprite.Sprite):
     image_shield = pygame.transform.scale(load_image("abilities/ability111.png"), (60, 60))
     image_shield2 = pygame.transform.scale(load_image("abilities/ability110.png"), (40, 40))
-    def __init__(self,player, *group):
+
+    def __init__(self, player, *group):
         super().__init__(*group)
         self.image2 = Shield.image_shield2
         self.image = Shield.image_shield
@@ -18,31 +20,39 @@ class Shield(pygame.sprite.Sprite):
         self.true = True
         self.NN = 0
         self.flip = False
-        self.damage = [0, 1 , 2]
+        self.damage = [0, 1, 2]
 
     def move(self, player, scroll):
         self.flip = player.flip
         self.rect.center = player.rect.center
         self.rect2.x, self.rect2.y = (player.rect.center[0] - 15, player.rect.y - 40)
+
     def draw(self, display):
         display.blit(self.image, self.rect)
+
     def draw2(self, display):
         display.blit(self.image2, self.rect2)
 
     def kick(self, mobs):
         if pygame.sprite.collide_mask(self, mobs):
             mobs.kicks(self.damage)
+
     def clocker(self):
         self.NN += 1
         if self.NN >= 480:
             self.kill()
+
     def update(self, scroll):
         pass
+
     def default(self):
         return True
+
+
 class Sword(pygame.sprite.Sprite):
     image_sword_right = pygame.transform.scale(load_image("abilities/ability000.png"), (60, 60))
     image_sword_left = pygame.transform.scale(load_image("abilities/ability001.png"), (60, 60))
+
     def __init__(self, player, *group):
         super().__init__(*group)
         if player.flip is False:
@@ -59,15 +69,17 @@ class Sword(pygame.sprite.Sprite):
         self.damage = [300, 200, 250, 350, 500, 100, 1]
         self.true = True
         self.NN = 0
+
     def move(self, player, scroll):
         dx = self.speed
         self.rect.x += dx
 
-
     def draw(self, display):
         display.blit(self.image, self.rect)
+
     def draw2(self, display):
         pass
+
     def update(self, scroll):
         self.rect.x -= scroll[0]
         self.rect.y -= scroll[1]
@@ -76,6 +88,7 @@ class Sword(pygame.sprite.Sprite):
         if pygame.sprite.collide_mask(self, mobs):
             mobs.kicks(self.damage)
             self.kill()
+
     def clocker(self):
         self.NN += 1
         if self.NN >= 30:
@@ -83,6 +96,7 @@ class Sword(pygame.sprite.Sprite):
 
     def default(self):
         return False
+
 
 class Ability():
     def __init__(self):
@@ -96,10 +110,10 @@ class Ability():
         self.image2 = self.image10
         self.rect1 = self.image1.get_rect()
         self.rect2 = self.image2.get_rect()
-        self.rect1.x, self.rect1.y = (DISPLAY_SIZE[0] // 2 // 2, DISPLAY_SIZE[1] // 2 // 2 )
+        self.rect1.x, self.rect1.y = (DISPLAY_SIZE[0] // 2 // 2, DISPLAY_SIZE[1] // 2 // 2)
         self.rect2.x, self.rect2.y = (self.rect1.x + 300, DISPLAY_SIZE[1] // 2 // 2)
 
-    def update(self,player, ui):
+    def update(self, player, ui):
         ability = 0
         if self.rect1.collidepoint(pygame.mouse.get_pos()):
             self.image1 = self.image01

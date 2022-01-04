@@ -1,4 +1,4 @@
-from screen_sizer import screener
+from Utilities.screen_sizer import screener
 # default
 FPS = 60
 SCREEN_SIZE, DISPLAY_SIZE, A_scroll, B_scroll = screener()
