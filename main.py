@@ -27,8 +27,6 @@ scroll = [0, 0]
 true_scroll = [0, 0]
 
 
-
-
 img_list = []
 for x in range(21):
     img = load_image(f'tiles/{x}.png')
@@ -57,14 +55,9 @@ if __name__ == '__main__':
     pygame.init()
     pygame.display.set_caption('Test')
 
-    pygame.font.init()
-    font_debug = pygame.font.SysFont('sprites/8514fixr.fon', 50)
-
     clock = pygame.time.Clock()
-    screen = pygame.display.set_mode(SCREEN_SIZE, 0,32)
-    display = pygame.Surface(DISPLAY_SIZE, 0,32)
-
-
+    screen = pygame.display.set_mode(SCREEN_SIZE, 0, 32)
+    display = pygame.Surface(DISPLAY_SIZE, 0, 32)
 
     kick_sound = pygame.mixer.Sound("sounds/kick.wav")
     jump_sound = pygame.mixer.Sound("sounds/jump.wav")
@@ -91,10 +84,8 @@ if __name__ == '__main__':
     all_sprites.add(sprite)
     pygame.mouse.set_visible(False)
 
-
     decorations = Decor()
     pickups = Pickup()
-
 
     world_data = []
     with open(f'levels/level.csv', newline='') as csvfile:
@@ -127,8 +118,8 @@ if __name__ == '__main__':
     abilityy = Ability()
 
     color_hp = (21, 143, 26)
+
     while running:
-# <<<<<< Misha
         if not pause:
             a = 0
             for i in abilities_group:
@@ -137,27 +128,30 @@ if __name__ == '__main__':
                 color_hp = (21, 143, 26)
             else:
                 color_hp = (20, 30, 255)
-            scroll_data = camera.obstacle_list(world, scroll)
+            scroll_data = camera.obstacle_list(world, scroll, decorations, pickups)
             draw_bg()
             decoration_mobs.draw(display)
-            world.draw(scroll_data)
+            world.draw(display, scroll_data)
+            decorations.decoration_group.draw(display)
+
+            pickups.pickups_group.draw(display)
+
             for i in abilities_group:
                 i.draw2(display)
+
             enemies.draw(display)
             player.draw(display)
+
             abilities_group.draw(display)
-            ui.draw_hp(player, display,color_hp)
+            ui.draw_hp(player, display, color_hp)
             ui.draw_mana(display, player)
 
-            ui.debug_mode(font_debug, display, kicks, clock)
+            ui.debug_mode(display, kicks, clock)
             for mob in decoration_mobs:
                 mob.update(scroll)
                 mob.move()
 
-
             for enemy in enemies:
-                for i in abilities_group:
-                    i.kick(enemy)
                 if pygame.sprite.spritecollide(enemy, kicks, False):
                     enemy.kick(player)
 
@@ -175,86 +169,52 @@ if __name__ == '__main__':
                 enemy.update(scroll)
                 enemy.move(player, scroll_data)
 
+            if pygame.sprite.spritecollide(player, pickups.pickups_group, False):
+                for pickup in pickups.pickups_group:
+                    if pygame.sprite.spritecollide(pickup, players, False):
+                        pickup.touch(player)
+
             kicks.empty()
 
+            player.update(scroll)
             if player.alive:
-                player.update(scroll)
                 player.move(moving_left, moving_right, scroll_data)
+
             for i in abilities_group:
                 i.update(scroll)
                 i.move(player, scroll)
                 i.clocker()
-
-
 
             true_scroll[0] = (player.rect.center[0] - true_scroll[0] - A_scroll) // 15
             true_scroll[1] = (player.rect.center[1] - true_scroll[1] - B_scroll) // 15
             scroll = true_scroll.copy()
             scroll[0], scroll[1] = int(scroll[0]), int(scroll[1])
         else:
-            moving_left = False
-            moving_right = False
+            # moving_left = False
+            # moving_right = False
+
             draw_bg()
             decoration_mobs.draw(display)
-            world.draw(scroll_data)
+            world.draw(display, scroll_data)
             for i in abilities_group:
                 i.draw2(display)
+
             enemies.draw(display)
             player.draw(display)
+
             abilities_group.draw(display)
             ui.draw_hp(player, display, color_hp)
             ui.draw_mana(display, player)
             if eventer == "ability":
                 a = abilityy.update(player, ui)
                 if a == 0:
-
                     abilityy.draw(display)
                 else:
                     abilities_group.add(a)
                     pause = False
             if pygame.mouse.get_focused():
-
                 sprite.rect.x, sprite.rect.y = pygame.mouse.get_pos()
                 all_sprites.draw(display)
-# =======
-        scroll_data = camera.obstacle_list(world, scroll, decorations, pickups)
-        draw_bg()
-        world.draw(display, scroll_data)
-        decorations.decoration_group.draw(display)
-        pickups.pickups_group.draw(display)
-
-        enemies.draw(display)
-        player.draw(display)
-
-        draw_hp()
-        # debug_mode()
-
-        for enemy in enemies:
-            if pygame.sprite.spritecollide(enemy, kicks, False):
-                enemy.kick(player)
-
-            if pygame.sprite.spritecollide(enemy, players, False):
-                if enemy.contact == 5:
-                    player.kick(enemy)
-                    enemy.contact = 0
-                enemy.contact += 1
-            else:
-                enemy.contact = 0
-            enemy.update(scroll)
-            enemy.move(player, scroll_data)
-
-        if pygame.sprite.spritecollide(player, pickups.pickups_group, False):
-            for pickup in pickups.pickups_group:
-                if pygame.sprite.spritecollide(pickup, players, False):
-                    pickup.touch(player)
-
-        kicks.empty()
-
-        player.update(scroll)
-        if player.alive:
-            player.move(moving_left, moving_right, scroll_data)
-# >>>>>>> dev(maks)
-
 
         for event in pygame.event.get():
             if event.type == QUIT:
