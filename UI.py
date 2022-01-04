@@ -1,6 +1,6 @@
 import pygame
-from load_image import load_image
-from constants import *
+from Utilities.load_image import load_image
+from Utilities.constants import *
 
 
 class UI:
