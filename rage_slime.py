@@ -112,6 +112,7 @@ class RageSlime(pygame.sprite.Sprite):
         if self.hp <= 0:
             player.mana_count += 3
             self.kill()
+
     def kicks(self, player):
         self.NN = 0
         self.hp -= random.choice(player)

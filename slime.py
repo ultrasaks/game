@@ -17,10 +17,9 @@ class Slime(pygame.sprite.Sprite):
     img_slime_down = pygame.transform.scale(load_image("enemy/slime/down_up.png"), (30, 30))
     img_slime_what = pygame.transform.scale(load_image("enemy/slime/what.png"), (30, 30))
 
-
     def __init__(self, x, y, speed=5, *group):
         super().__init__(*group)
-        self.speed = speed + 3
+        self.speed = speed
         self.vel_y = 0
         self.image = Slime.img_slime_down
         self.rect = self.image.get_rect()
@@ -94,7 +93,6 @@ class Slime(pygame.sprite.Sprite):
                     self.in_air = False
                     dy = tile[1].top - self.rect.bottom
 
-
         if self.NN >= 15:
             if dy > GRAVITY_SLIME:
                 self.image = self.img_slime_down_air
@@ -114,6 +112,7 @@ class Slime(pygame.sprite.Sprite):
         if self.hp <= 0:
             player.mana_count += 1
             self.kill()
+
     def kicks(self, player):
         self.NN = 0
         self.hp -= random.choice(player)
@@ -125,4 +124,3 @@ class Slime(pygame.sprite.Sprite):
     def update(self, scroll):
         self.rect.x -= scroll[0]
         self.rect.y -= scroll[1]
-
