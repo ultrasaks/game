@@ -1,6 +1,6 @@
-from load_image import load_image
+from Utilities.load_image import load_image
 import pygame
-from constants import *
+from Utilities.constants import *
 import random
 import math
 

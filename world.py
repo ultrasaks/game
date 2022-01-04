@@ -1,11 +1,11 @@
 import pygame
 
 from player import Player
-from slime import Slime
-from rage_slime import RageSlime
-from constants import *
+from Enemies.slime import Slime
+from Enemies.rage_slime import RageSlime
+from Utilities.constants import *
 
-from pickups.armor import Armor
+from Pickups.armor import Armor
 
 
 class World:
