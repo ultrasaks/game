@@ -16,6 +16,9 @@ from bird import Bird
 from slime import Slime
 from rage_slime import RageSlime
 from ability import Ability
+from decor import Decor
+from world import World
+from pickup import Pickup
 
 moving_left = False
 moving_right = False
@@ -33,58 +36,6 @@ for x in range(21):
     img_list.append(img)
 
 
-class World:
-    def __init__(self):
-        self.obstacle_list = []
-
-    def process_data(self, data):
-        global player
-        for y, row in enumerate(data):
-            for x, tile in enumerate(row):
-                if tile >= 0:
-                    img = img_list[tile]
-                    img_rect = img.get_rect()
-                    img_rect.x = x * TILE_SIZE
-                    img_rect.y = y * TILE_SIZE
-                    tile_data = (img, img_rect)
-                    if 0 <= tile <= 8:
-                        self.obstacle_list.append(tile_data)
-                    elif 11 <= tile <= 14:
-                        decoration = Decoration(
-                            img, x * TILE_SIZE, y * TILE_SIZE)
-                        decoration_group.add(decoration)
-                    elif tile == 15:
-                        player = Player(x * 38, y * 38, 5)
-
-                        pass
-                    elif tile == 16:
-                        slime = Slime(x * 38, y * 38, 2)
-                        rage_slime = RageSlime(x * 38 + 10, y * 38, 2)
-                        enemies.add(slime)
-                        enemies.add(rage_slime)
-                        pass
-                    elif tile == 20:
-                        # exit = Exit(img, x * TILE_SIZE, y * TILE_SIZE)
-                        # exit_group.add(exit)
-                        pass
-
-        return player
-
-    def draw(self, scroll_data):
-        for tile in scroll_data:
-
-            display.blit(tile[0], tile[1])
-
-
-class Decoration(pygame.sprite.Sprite):
-    def __init__(self, img, x, y):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = img
-        self.rect = self.image.get_rect()
-        self.rect.midtop = (x + TILE_SIZE // 2, y +
-                            (TILE_SIZE - self.image.get_height()))
-
-
 def draw_bg():
     display.fill((105, 193, 231))
 
@@ -100,12 +51,6 @@ def kick():
     kickTest.rect.x, kickTest.rect.y = player.rect.x + kickpos, player.rect.y - 13
     kicks.add(kickTest)
     player.isKick = 7
-
-
-
-
-
-
 
 
 if __name__ == '__main__':
@@ -132,6 +77,7 @@ if __name__ == '__main__':
     running = True
     kicks = pygame.sprite.Group()
     players = pygame.sprite.Group()
+
     decoration_group = pygame.sprite.Group()
     enemies = pygame.sprite.Group()
     decoration_mobs = pygame.sprite.Group()
@@ -146,8 +92,12 @@ if __name__ == '__main__':
     pygame.mouse.set_visible(False)
 
 
+    decorations = Decor()
+    pickups = Pickup()
+
+
     world_data = []
-    with open(f'levels/level1_data.csv', newline='') as csvfile:
+    with open(f'levels/level.csv', newline='') as csvfile:
         reader = csv.reader(csvfile, delimiter=',')
         readerData = [row for row in reader]
 
@@ -160,12 +110,15 @@ if __name__ == '__main__':
         for x, row in enumerate(readerData):
             for y, tile in enumerate(row):
                 world_data[x][y] = int(tile)
-    world = World()
-    player = world.process_data(world_data)
+
+    world = World(img_list)
+    player = world.process_data(world_data, decorations, enemies, pickups)
     for i in range(50):
         bird = Bird(random.randint(50, 2000), random.randint(-6000, 0))
         decoration_mobs.add(bird)
+        
     players.add(player)
+    
     camera = Camera()
     ui = UI()
     pause = False
@@ -175,6 +128,7 @@ if __name__ == '__main__':
 
     color_hp = (21, 143, 26)
     while running:
+# <<<<<< Misha
         if not pause:
             a = 0
             for i in abilities_group:
@@ -262,6 +216,44 @@ if __name__ == '__main__':
 
                 sprite.rect.x, sprite.rect.y = pygame.mouse.get_pos()
                 all_sprites.draw(display)
+# =======
+        scroll_data = camera.obstacle_list(world, scroll, decorations, pickups)
+        draw_bg()
+        world.draw(display, scroll_data)
+        decorations.decoration_group.draw(display)
+        pickups.pickups_group.draw(display)
+
+        enemies.draw(display)
+        player.draw(display)
+
+        draw_hp()
+        # debug_mode()
+
+        for enemy in enemies:
+            if pygame.sprite.spritecollide(enemy, kicks, False):
+                enemy.kick(player)
+
+            if pygame.sprite.spritecollide(enemy, players, False):
+                if enemy.contact == 5:
+                    player.kick(enemy)
+                    enemy.contact = 0
+                enemy.contact += 1
+            else:
+                enemy.contact = 0
+            enemy.update(scroll)
+            enemy.move(player, scroll_data)
+
+        if pygame.sprite.spritecollide(player, pickups.pickups_group, False):
+            for pickup in pickups.pickups_group:
+                if pygame.sprite.spritecollide(pickup, players, False):
+                    pickup.touch(player)
+
+        kicks.empty()
+
+        player.update(scroll)
+        if player.alive:
+            player.move(moving_left, moving_right, scroll_data)
+# >>>>>>> dev(maks)
 
 
         for event in pygame.event.get():

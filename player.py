@@ -12,8 +12,6 @@ class Player(pygame.sprite.Sprite):
     jumpSprite = load_image('test_sprite_jump.png')
     fallSprite = load_image('test_sprite_fall.png')
     kickSprite = load_image('test_sprite_kick.png')
-    # kickSprite.set_colorkey((255, 0, 0))
-
 
     def __init__(self, x, y, speed=5, *group):
         super().__init__(*group)
@@ -27,10 +25,12 @@ class Player(pygame.sprite.Sprite):
         self.flip = False
         self.alive = True
         self.doubleJ = False
-        self.defence = 0  # потом
+
+        self.defence = 1  # потом
         self.damage = [15, 30]
         self.mana = True
         self.mana_count = 0
+
         self.hp = 100  # потом
         self.width = self.image.get_width()
         self.height = self.image.get_height()
@@ -38,7 +38,6 @@ class Player(pygame.sprite.Sprite):
         self.spriteRun = False
         self.isKick = 0
         self.delay = 0
-
 
     def move(self, moving_left, moving_right, world):
         # движение за этот ход
@@ -120,26 +119,11 @@ class Player(pygame.sprite.Sprite):
         self.rect.x += dx
         self.rect.y += dy
         scroll_x, scroll_y = 0, 0
-        # if (self.rect.right > SCREEN_SIZE[0] - 350) \
-        #         or (self.rect.left < 350):
-        #     self.rect.x -= dx
-        #     scroll_x = -dx
-        # БАГИ БАГИ БАГИ!!!
-        # if (self.rect.bottom > SCREEN_SIZE[1] - 200) \
-        #         or (self.rect.bottom < 200):
-        #     if self.rect.bottom < 200:
-        #         self.rect.y += math.fabs(dy)
-        #         scroll_y = math.fabs(dy)
-        #     else:
-        #         self.rect.y -= math.fabs(dy)
-        #         scroll_y = -math.fabs(dy)
-        #     print(self.rect.bottom, dy, scroll_y)
         return scroll_x, scroll_y
-
 
     def kick(self, enemy):
         if self.delay == 0:
-            self.hp -= enemy.damage
+            self.hp -= enemy.damage * self.defence
             self.delay = 50
         if self.hp <= 0:
             self.alive = False
@@ -155,3 +139,13 @@ class Player(pygame.sprite.Sprite):
     def update(self, scroll):
         self.rect.x -= scroll[0]
         self.rect.y -= scroll[1]
+
+    def equip_armor(self):
+        self.baseSprite = load_image("player/armor_base.png")
+        self.runSprite = load_image('player/armor_step1.png')
+        self.runSprite2 = load_image('player/armor_step2.png')
+        self.jumpSprite = load_image('player/armor_jump.png')
+        self.fallSprite = load_image('player/armor_fall.png')
+        self.kickSprite = load_image('player/armor_kick.png')
+
+        self.defence = 0.5
