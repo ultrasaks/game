@@ -75,8 +75,8 @@ class RageSlime(pygame.sprite.Sprite):
                 dx -= 8
             else:
                 dx += 8
-            dy += 1.5
-            dy += GRAVITY_SLIME
+            self.vel_y += 1.5
+            dy += GRAVITY_SLIME + 1.5
 
         for tile in world:
             # check collision in the x direction
@@ -110,6 +110,15 @@ class RageSlime(pygame.sprite.Sprite):
         self.player_flip = player.flip
         print(f'Слайм получил урон|{self.hp}')
         if self.hp <= 0:
+            player.mana_count += 3
+            self.kill()
+    def kicks(self, player):
+        self.NN = 0
+        self.hp -= random.choice(player)
+        self.flip = False
+        print(f'Слайм получил урон|{self.hp}')
+        if self.hp <= 0:
+
             self.kill()
 
     def update(self, scroll):
