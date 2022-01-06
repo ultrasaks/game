@@ -27,15 +27,21 @@ scroll_data = []
 scroll = [0, 0]
 true_scroll = [0, 0]
 level = 0
-cutscenes = {0: [[240, 'доброе утро, чтобы совершить прыжок можно нажать [W] или [↑]']]}
+cutscenes = {0: [[20, 'доброе утро, чтобы совершить прыжок можно нажать [W] или [↑]']]}
 isCutscene = False
 
 
 img_list = []
-for x in range(21):
+decor_list = []
+for x in range(15):
     img = load_image(f'tiles/{x}.png')
     img = pygame.transform.scale(img, (TILE_SIZE, TILE_SIZE))
     img_list.append(img)
+
+for x in range(500, 504):
+    img = load_image(f'tiles/{x}.png')
+    img = pygame.transform.scale(img, (TILE_SIZE, TILE_SIZE))
+    decor_list.append(img)
 
 
 def draw_bg():
@@ -65,7 +71,6 @@ def startup():
     decoration_mobs = pygame.sprite.Group()
     abilities_group = pygame.sprite.Group()
 
-
     all_sprites = pygame.sprite.Group()
     sprite = pygame.sprite.Sprite()
     image = pygame.transform.scale(load_image("enemy/slime/jump.png"), (15, 15))
@@ -89,9 +94,12 @@ def startup():
 
         for x, row in enumerate(readerData):
             for y, tile in enumerate(row):
-                world_data[x][y] = int(tile)
+                try:
+                    world_data[x][y] = int(tile)
+                except:
+                    pass
 
-    world = World(img_list)
+    world = World(img_list, decor_list)
     if players:
         print(player.defence, player.hp)
         player = world.process_data(world_data, decorations, enemies, pickups, [player.defence, player.hp])
@@ -141,7 +149,6 @@ if __name__ == '__main__':
     color_hp = (21, 143, 26)
 
     while running:
-
         if newLevel:
             level += 1
             startup()

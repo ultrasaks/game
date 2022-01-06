@@ -11,24 +11,31 @@ from Pickups.cutscene import Cutscene
 
 
 class World:
-    def __init__(self, img_list):
+    def __init__(self, img_list, decor_list):
         self.obstacle_list = []
         self.img_list = img_list
+        self.decor_list = decor_list
 
     def process_data(self, data, decorations, enemies, pickups, inventory=None):
         for y, row in enumerate(data):
             for x, tile in enumerate(row):
                 if tile >= 0:
-                    if tile < 700:
+                    if tile < 500 and tile != 15:
                         img = self.img_list[tile]
                         img_rect = img.get_rect()
                         img_rect.x = x * TILE_SIZE
                         img_rect.y = y * TILE_SIZE
                         tile_data = (img, img_rect)
+                    elif 500 <= tile < 700:
+                        img = self.decor_list[tile - 500]
+                        img_rect = img.get_rect()
+                        img_rect.x = x * TILE_SIZE
+                        img_rect.y = y * TILE_SIZE
+                        tile_data = (img, img_rect)
 
-                    if 0 <= tile <= 8:
+                    if 0 <= tile < 500 and tile != 15:
                         self.obstacle_list.append(tile_data)
-                    elif 11 <= tile <= 14:
+                    elif 500 <= tile < 700:
                         decorations.add_decor(img, x * TILE_SIZE, y * TILE_SIZE)
                     elif tile == 15:
                         player = Player(x * 38, y * 38, 5, inventory)
