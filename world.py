@@ -6,6 +6,8 @@ from Enemies.rage_slime import RageSlime
 from Utilities.constants import *
 
 from Pickups.armor import Armor
+from Pickups.exit import Exit
+from Pickups.cutscene import Cutscene
 
 
 class World:
@@ -13,7 +15,7 @@ class World:
         self.obstacle_list = []
         self.img_list = img_list
 
-    def process_data(self, data, decorations, enemies, pickups):
+    def process_data(self, data, decorations, enemies, pickups, inventory=None):
         for y, row in enumerate(data):
             for x, tile in enumerate(row):
                 if tile >= 0:
@@ -29,7 +31,7 @@ class World:
                     elif 11 <= tile <= 14:
                         decorations.add_decor(img, x * TILE_SIZE, y * TILE_SIZE)
                     elif tile == 15:
-                        player = Player(x * 38, y * 38, 5)
+                        player = Player(x * 38, y * 38, 5, inventory)
                         pass
                     elif tile == 800:
                         slime = Slime(x * 38, y * 38, 2)
@@ -40,8 +42,11 @@ class World:
                         enemies.add(rage_slime)
                     elif tile == 700:
                         arm = Armor()
-                        pickups.add_pickup(arm, x * 38 + 10, y * 38)
-                        pass
+                        pickups.add_pickup(arm, x * 38, y * 38)
+                    elif tile == 701:
+                        pickups.add_pickup(Exit(), x * 38, y * 38)
+                    elif tile == 702:
+                        pickups.add_pickup(Cutscene(), x * 38, y * 38)
 
         return player
 
