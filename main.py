@@ -26,14 +26,15 @@ newLevel = False
 scroll_data = []
 scroll = [0, 0]
 true_scroll = [0, 0]
-level = 0
-cutscenes = {0: [[20, 'доброе утро, чтобы совершить прыжок можно нажать [W] или [↑]']]}
+level = 1
+cutscenes = {0: [[20, 'Игрок бегает на кнопки [A]|[D] и [←]|[→]'], [20, 'Прыжок совершается на [W] или [↑]']],
+             1: [[300, 'У тебя в руке меч, это значит что ты можешь бить им на [SPACE] или [↓]']]}
 isCutscene = False
 
 
 img_list = []
 decor_list = []
-for x in range(15):
+for x in range(17):
     img = load_image(f'tiles/{x}.png')
     img = pygame.transform.scale(img, (TILE_SIZE, TILE_SIZE))
     img_list.append(img)
@@ -101,8 +102,9 @@ def startup():
 
     world = World(img_list, decor_list)
     if players:
+        players.empty()
         print(player.defence, player.hp)
-        player = world.process_data(world_data, decorations, enemies, pickups, [player.defence, player.hp])
+        player = world.process_data(world_data, decorations, enemies, pickups, [player.defence, player.hp, player.damage])
     else:
         player = world.process_data(world_data, decorations, enemies, pickups)
     for i in range(50):
@@ -209,6 +211,8 @@ if __name__ == '__main__':
                 if player.alive:
                     player.move(moving_left, moving_right, scroll_data)
             else:
+                for enemy in enemies:
+                    enemy.update(scroll)
                 if cutscenes[level][0][0] > 0:
                     cutscenes[level][0][0] -= 1
 

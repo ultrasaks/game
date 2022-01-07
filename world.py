@@ -8,6 +8,8 @@ from Utilities.constants import *
 from Pickups.armor import Armor
 from Pickups.exit import Exit
 from Pickups.cutscene import Cutscene
+from Pickups.death import Death
+from Pickups.bebra import Bebra
 
 
 class World:
@@ -54,6 +56,10 @@ class World:
                         pickups.add_pickup(Exit(), x * 38, y * 38)
                     elif tile == 702:
                         pickups.add_pickup(Cutscene(), x * 38, y * 38)
+                    elif tile == 703:
+                        pickups.add_pickup(Death(), x * 38, y * 38)
+                    elif tile == 704:
+                        pickups.add_pickup(Bebra(), x * 38, y * 38)
 
         return player
 

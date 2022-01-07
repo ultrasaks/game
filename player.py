@@ -40,11 +40,12 @@ class Player(pygame.sprite.Sprite):
         self.delay = 0
 
         if inventory is None:
-            self.inventory = [0, 100]
+            self.inventory = [0, 100, [15, 30]]
         else:
             if inventory[0] < 1:
                 self.equip_armor()
             self.hp = inventory[1]
+            self.damage = inventory[2]
 
     def move(self, moving_left, moving_right, world):
         # движение за этот ход

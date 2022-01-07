@@ -2,8 +2,8 @@ import pygame
 from Utilities.load_image import load_image
 
 
-class Exit(pygame.sprite.Sprite):
-    img = load_image('pickups/701.png')
+class Death(pygame.sprite.Sprite):
+    img = load_image('tiles/16.png')
 
     def __init__(self):
         super().__init__()
