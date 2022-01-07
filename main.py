@@ -27,14 +27,14 @@ scroll_data = []
 scroll = [0, 0]
 true_scroll = [0, 0]
 level = 1
-cutscenes = {0: [[20, 'Игрок бегает на кнопки [A]|[D] и [←]|[→]'], [20, 'Прыжок совершается на [W] или [↑]']],
+cutscenes = {0: [[410, 'Игрок бегает на кнопки [A]|[D] и [←]|[→]'], [300, 'Прыжок совершается на [W] или [↑]']],
              1: [[300, 'У тебя в руке меч, это значит что ты можешь бить им на [SPACE] или [↓]']]}
 isCutscene = False
 
 
 img_list = []
 decor_list = []
-for x in range(17):
+for x in range(20):
     img = load_image(f'tiles/{x}.png')
     img = pygame.transform.scale(img, (TILE_SIZE, TILE_SIZE))
     img_list.append(img)
