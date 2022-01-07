@@ -13,7 +13,7 @@ class Player(pygame.sprite.Sprite):
     fallSprite = load_image('test_sprite_fall.png')
     kickSprite = load_image('test_sprite_kick.png')
 
-    def __init__(self, x, y, speed=5, *group):
+    def __init__(self, x, y, speed=5, inventory=None, *group):
         super().__init__(*group)
         self.speed = speed
         self.vel_y = 0
@@ -38,6 +38,14 @@ class Player(pygame.sprite.Sprite):
         self.spriteRun = False
         self.isKick = 0
         self.delay = 0
+
+        if inventory is None:
+            self.inventory = [0, 100, [15, 30]]
+        else:
+            if inventory[0] < 1:
+                self.equip_armor()
+            self.hp = inventory[1]
+            self.damage = inventory[2]
 
     def move(self, moving_left, moving_right, world):
         # движение за этот ход
