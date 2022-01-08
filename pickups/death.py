@@ -11,4 +11,5 @@ class Death(pygame.sprite.Sprite):
 
     def touch(self, player, level, isCutscene):
         player.hp = 0
+        player.alive = False
         return level, isCutscene

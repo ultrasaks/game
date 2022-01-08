@@ -26,7 +26,10 @@ newLevel = False
 scroll_data = []
 scroll = [0, 0]
 true_scroll = [0, 0]
-level = 1
+
+old_Inventory = None
+
+level = 2
 cutscenes = {0: [[410, 'Игрок бегает на кнопки [A]|[D] и [←]|[→]'], [300, 'Прыжок совершается на [W] или [↑]']],
              1: [[300, 'У тебя в руке меч, это значит что ты можешь бить им на [SPACE] или [↓]']]}
 isCutscene = False
@@ -39,7 +42,7 @@ for x in range(20):
     img = pygame.transform.scale(img, (TILE_SIZE, TILE_SIZE))
     img_list.append(img)
 
-for x in range(500, 504):
+for x in range(500, 505):
     img = load_image(f'tiles/{x}.png')
     img = pygame.transform.scale(img, (TILE_SIZE, TILE_SIZE))
     decor_list.append(img)
@@ -64,7 +67,7 @@ def kick():
 
 def startup():
     global kicks, players, decoration_group, enemies, decoration_mobs, abilities_group, all_sprites, \
-        sprite, image, decorations, pickups, world_data, world, player, camera, ui
+        sprite, image, decorations, pickups, world_data, world, player, camera, ui, old_Inventory, cur_cutscene
     kicks = pygame.sprite.Group()
 
     decoration_group = pygame.sprite.Group()
@@ -102,11 +105,13 @@ def startup():
 
     world = World(img_list, decor_list)
     if players:
+        if player.hp > 0:
+            old_Inventory = [player.defence, player.hp, player.damage]
         players.empty()
-        print(player.defence, player.hp)
-        player = world.process_data(world_data, decorations, enemies, pickups, [player.defence, player.hp, player.damage])
+        player = world.process_data(world_data, decorations, enemies, pickups, old_Inventory)
     else:
         player = world.process_data(world_data, decorations, enemies, pickups)
+    old_Inventory = [player.defence, player.hp, player.damage]
     for i in range(50):
         bird = Bird(random.randint(50, 2000), random.randint(-6000, 0))
         decoration_mobs.add(bird)
@@ -115,11 +120,12 @@ def startup():
 
     camera = Camera()
     ui = UI()
+    cur_cutscene = 0
 
 
 if __name__ == '__main__':
     global kicks, players, decoration_group, enemies, decoration_mobs, abilities_group, all_sprites, \
-        sprite, image, decorations, pickups, world_data, world, player, camera, ui
+        sprite, image, decorations, pickups, world_data, world, player, camera, ui, cur_cutscene
     pygame.init()
     pygame.display.set_caption('Test')
     font_cutscene = pygame.font.SysFont('Tahoma', 15)
@@ -157,7 +163,6 @@ if __name__ == '__main__':
             newLevel = False
 
         if not pause:
-
             a = 0
             for i in abilities_group:
                 a = i.default()
@@ -210,17 +215,19 @@ if __name__ == '__main__':
 
                 if player.alive:
                     player.move(moving_left, moving_right, scroll_data)
+                else:
+                    startup()
             else:
                 for enemy in enemies:
                     enemy.update(scroll)
-                if cutscenes[level][0][0] > 0:
-                    cutscenes[level][0][0] -= 1
+                if cutscenes[level][cur_cutscene][0] > 0:
+                    cutscenes[level][cur_cutscene][0] -= 1
 
-                    textsurface = font_cutscene.render(cutscenes[level][0][1], False, (255, 255, 0))
-                    display.blit(textsurface, (player.rect.x - len(cutscenes[level][0][1]) * 3, player.rect.y - 100))
+                    textsurface = font_cutscene.render(cutscenes[level][cur_cutscene][1], False, (255, 255, 0))
+                    display.blit(textsurface, (player.rect.x - len(cutscenes[level][cur_cutscene][1]) * 3, player.rect.y - 100))
                 else:
                     isCutscene = False
-                    cutscenes[level].pop(0)
+                    cur_cutscene += 1
 
             if pygame.sprite.spritecollide(player, pickups.pickups_group, False):
                 for pickup in pickups.pickups_group:
@@ -239,13 +246,9 @@ if __name__ == '__main__':
             scroll = true_scroll.copy()
             scroll[0], scroll[1] = int(scroll[0]), int(scroll[1])
 
-
-
-
         else:
             # moving_left = False
             # moving_right = False
-
             draw_bg()
             decoration_mobs.draw(display)
             world.draw(display, scroll_data)

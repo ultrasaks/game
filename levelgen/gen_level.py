@@ -36,6 +36,9 @@ for j in range(y):
         elif pixels[i, j] == (158, 64, 20, 255) or pixels[i, j] == (158, 64, 20):
             level[j][i] = 19
 
+        elif pixels[i, j] == (46, 95, 95, 255) or pixels[i, j] == (46, 95, 95):
+            level[j][i] = 504
+
         elif pixels[i, j] == (32, 81, 82, 255) or pixels[i, j] == (32, 81, 82):
             level[j][i] = 701
         elif pixels[i, j] == (1, 70, 71, 255) or pixels[i, j] == (1, 70, 71):
