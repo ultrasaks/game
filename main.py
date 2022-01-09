@@ -21,16 +21,31 @@ from pickup import Pickup
 
 moving_left = False
 moving_right = False
+newLevel = False
+
 scroll_data = []
 scroll = [0, 0]
 true_scroll = [0, 0]
 
+old_Inventory = None
+
+level = 6
+cutscenes = {0: [[410, 'Игрок бегает на кнопки [A]|[D] и [←]|[→]'], [300, 'Прыжок совершается на [W] или [↑]']],
+             1: [[300, 'У тебя в руке меч, это значит что ты можешь бить им на [SPACE] или [↓]']]}
+isCutscene = False
+
 
 img_list = []
-for x in range(21):
+decor_list = []
+for x in range(20):
     img = load_image(f'tiles/{x}.png')
     img = pygame.transform.scale(img, (TILE_SIZE, TILE_SIZE))
     img_list.append(img)
+
+for x in range(500, 505):
+    img = load_image(f'tiles/{x}.png')
+    img = pygame.transform.scale(img, (TILE_SIZE, TILE_SIZE))
+    decor_list.append(img)
 
 
 def draw_bg():
@@ -50,9 +65,76 @@ def kick():
     player.isKick = 7
 
 
+def startup():
+    global kicks, players, decoration_group, enemies, decoration_mobs, abilities_group, all_sprites, \
+        sprite, image, decorations, pickups, world_data, world, player, camera, ui, old_Inventory, cur_cutscene, \
+        boss, bosses
+    kicks = pygame.sprite.Group()
+    boss = None
+    decoration_group = pygame.sprite.Group()
+    enemies = pygame.sprite.Group()
+    decoration_mobs = pygame.sprite.Group()
+    abilities_group = pygame.sprite.Group()
+    bosses = pygame.sprite.Group()
+
+    all_sprites = pygame.sprite.Group()
+    sprite = pygame.sprite.Sprite()
+    image = pygame.transform.scale(load_image("enemy/slime/jump.png"), (15, 15))
+    sprite.image = image
+    sprite.rect = image.get_rect()
+    all_sprites.add(sprite)
+
+    decorations = Decor()
+    pickups = Pickup()
+
+    world_data = []
+    with open(f'levels/level{level}_data.csv', newline='') as csvfile:
+        reader = csv.reader(csvfile, delimiter=',')
+        readerData = [row for row in reader]
+
+        rows = len(readerData)  # создание пустого уровня
+        cols = len(readerData[0])
+        for row in range(rows):
+            r = [-1] * cols
+            world_data.append(r)
+
+        for x, row in enumerate(readerData):
+            for y, tile in enumerate(row):
+                try:
+                    world_data[x][y] = int(tile)
+                except:
+                    pass
+
+    world = World(img_list, decor_list)
+    if players:
+        if player.hp > 0:
+            old_Inventory = [player.defence, player.hp, player.damage]
+        players.empty()
+        player, boss = world.process_data(world_data, decorations, enemies, pickups, old_Inventory)
+    else:
+        player, boss = world.process_data(world_data, decorations, enemies, pickups)
+    old_Inventory = [player.defence, player.hp, player.damage]
+    for i in range(50):
+        bird = Bird(random.randint(50, 2000), random.randint(-6000, 0))
+        decoration_mobs.add(bird)
+
+    players.add(player)
+    camera = Camera()
+    ui = UI()
+    cur_cutscene = 0
+
+    if boss is not None:
+        bosses.add(boss)
+
+
 if __name__ == '__main__':
+    global kicks, players, decoration_group, enemies, decoration_mobs, abilities_group, all_sprites, \
+        sprite, image, decorations, pickups, world_data, world, player, camera, ui, cur_cutscene, boss
     pygame.init()
     pygame.display.set_caption('Test')
+    font_cutscene = pygame.font.SysFont('Tahoma', 15)
+
+    players = pygame.sprite.Group()
 
     clock = pygame.time.Clock()
     screen = pygame.display.set_mode(SCREEN_SIZE, 0, 32)
@@ -66,51 +148,11 @@ if __name__ == '__main__':
     vol = 0.2
     pygame.mixer.music.set_volume(vol)
 
+    startup()
+
     running = True
-    kicks = pygame.sprite.Group()
-    players = pygame.sprite.Group()
-
-    decoration_group = pygame.sprite.Group()
-    enemies = pygame.sprite.Group()
-    decoration_mobs = pygame.sprite.Group()
-    abilities_group = pygame.sprite.Group()
-
-    all_sprites = pygame.sprite.Group()
-    sprite = pygame.sprite.Sprite()
-    image = pygame.transform.scale(load_image("enemy/slime/jump.png"), (15, 15))
-    sprite.image = image
-    sprite.rect = image.get_rect()
-    all_sprites.add(sprite)
     pygame.mouse.set_visible(False)
 
-    decorations = Decor()
-    pickups = Pickup()
-
-    world_data = []
-    with open(f'levels/level.csv', newline='') as csvfile:
-        reader = csv.reader(csvfile, delimiter=',')
-        readerData = [row for row in reader]
-
-        rows = len(readerData)  # создание пустого уровня
-        cols = len(readerData[0])
-        for row in range(rows):
-            r = [-1] * cols
-            world_data.append(r)
-
-        for x, row in enumerate(readerData):
-            for y, tile in enumerate(row):
-                world_data[x][y] = int(tile)
-
-    world = World(img_list)
-    player = world.process_data(world_data, decorations, enemies, pickups)
-    for i in range(50):
-        bird = Bird(random.randint(50, 2000), random.randint(-6000, 0))
-        decoration_mobs.add(bird)
-        
-    players.add(player)
-    
-    camera = Camera()
-    ui = UI()
     pause = False
     eventer = ""
 
@@ -119,6 +161,12 @@ if __name__ == '__main__':
     color_hp = (21, 143, 26)
 
     while running:
+        # print(true_scroll)
+        if newLevel:
+            level += 1
+            startup()
+            newLevel = False
+
         if not pause:
             a = 0
             for i in abilities_group:
@@ -141,6 +189,27 @@ if __name__ == '__main__':
             enemies.draw(display)
             player.draw(display)
 
+            if boss is not None:
+                for bossK in bosses:  # без группы и следования по спрайтам в ней нельзя удалить спрайт, спасибо пайгейм
+                    bossK.draw(display)
+                    bossK.update(scroll)
+                    bossK.move(player, scroll_data)
+
+                    if pygame.sprite.spritecollide(bossK, players, False):
+                        if bossK.contact == 5:
+                            if not a:
+                                color_hp = (21, 143, 26)
+                                player.kick(bossK)
+                                bossK.contact = 0
+                            else:
+                                color_hp = (20, 30, 255)
+                        bossK.contact += 1
+                    else:
+                        bossK.contact = 0
+                    if pygame.sprite.spritecollide(bossK, kicks, False):
+                        bossK.kick(player)
+
+
             abilities_group.draw(display)
             ui.draw_hp(player, display, color_hp)
             ui.draw_mana(display, player)
@@ -150,34 +219,48 @@ if __name__ == '__main__':
                 mob.update(scroll)
                 mob.move()
 
-            for enemy in enemies:
-                if pygame.sprite.spritecollide(enemy, kicks, False):
-                    enemy.kick(player)
+            player.update(scroll)
+            if not isCutscene:
+                for enemy in enemies:
+                    if pygame.sprite.spritecollide(enemy, kicks, False):
+                        enemy.kick(player)
 
-                if pygame.sprite.spritecollide(enemy, players, False):
-                    if enemy.contact == 5:
-                        if not a:
-                            color_hp = (21, 143, 26)
-                            player.kick(enemy)
-                            enemy.contact = 0
-                        else:
-                            color_hp = (20, 30, 255)
-                    enemy.contact += 1
+                    if pygame.sprite.spritecollide(enemy, players, False):
+                        if enemy.contact == 5:
+                            if not a:
+                                color_hp = (21, 143, 26)
+                                player.kick(enemy)
+                                enemy.contact = 0
+                            else:
+                                color_hp = (20, 30, 255)
+                        enemy.contact += 1
+                    else:
+                        enemy.contact = 0
+                    enemy.update(scroll)
+                    enemy.move(player, scroll_data)
+
+                if player.alive:
+                    player.move(moving_left, moving_right, scroll_data)
                 else:
-                    enemy.contact = 0
-                enemy.update(scroll)
-                enemy.move(player, scroll_data)
+                    startup()
+            else:
+                for enemy in enemies:
+                    enemy.update(scroll)
+                if cutscenes[level][cur_cutscene][0] > 0:
+                    cutscenes[level][cur_cutscene][0] -= 1
+
+                    textsurface = font_cutscene.render(cutscenes[level][cur_cutscene][1], False, (255, 255, 0))
+                    display.blit(textsurface, (player.rect.x - len(cutscenes[level][cur_cutscene][1]) * 3, player.rect.y - 100))
+                else:
+                    isCutscene = False
+                    cur_cutscene += 1
 
             if pygame.sprite.spritecollide(player, pickups.pickups_group, False):
                 for pickup in pickups.pickups_group:
                     if pygame.sprite.spritecollide(pickup, players, False):
-                        pickup.touch(player)
+                        newLevel, isCutscene = pickup.touch(player, newLevel, isCutscene)
 
             kicks.empty()
-
-            player.update(scroll)
-            if player.alive:
-                player.move(moving_left, moving_right, scroll_data)
 
             for i in abilities_group:
                 i.update(scroll)
@@ -188,10 +271,10 @@ if __name__ == '__main__':
             true_scroll[1] = (player.rect.center[1] - true_scroll[1] - B_scroll) // 15
             scroll = true_scroll.copy()
             scroll[0], scroll[1] = int(scroll[0]), int(scroll[1])
+
         else:
             # moving_left = False
             # moving_right = False
-
             draw_bg()
             decoration_mobs.draw(display)
             world.draw(display, scroll_data)
