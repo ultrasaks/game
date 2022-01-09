@@ -25,6 +25,18 @@ for j in range(y):
             level[j][i] = 7
         elif pixels[i, j] == (128, 74, 10, 255) or pixels[i, j] == (128, 74, 10):
             level[j][i] = 8
+        elif pixels[i, j] == (154, 148, 139, 255) or pixels[i, j] == (154, 148, 139):
+            level[j][i] = 9
+        elif pixels[i, j] == (174, 148, 139, 255) or pixels[i, j] == (174, 148, 139):
+            level[j][i] = 10
+        elif pixels[i, j] == (134, 148, 139, 255) or pixels[i, j] == (134, 148, 139):
+            level[j][i] = 11
+        elif pixels[i, j] == (154, 148, 119, 255) or pixels[i, j] == (154, 148, 119):
+            level[j][i] = 12
+        elif pixels[i, j] == (174, 148, 119, 255) or pixels[i, j] == (174, 148, 119):
+            level[j][i] = 13
+        elif pixels[i, j] == (134, 148, 119, 255) or pixels[i, j] == (134, 148, 119):
+            level[j][i] = 14
         elif pixels[i, j] == (237, 28, 36, 255) or pixels[i, j] == (237, 28, 36):
             level[j][i] = 15  # игрок
         elif pixels[i, j] == (28, 235, 237, 255) or pixels[i, j] == (28, 235, 237):
@@ -52,7 +64,8 @@ for j in range(y):
             level[j][i] = 800
         elif pixels[i, j] == (255, 200, 0, 255) or pixels[i, j] == (255, 200, 0):
             level[j][i] = 801
-
+        elif pixels[i, j] == (255, 100, 0, 255) or pixels[i, j] == (255, 100, 0):
+            level[j][i] = 802
 
 with open('level.csv', 'w') as file:
     file.write(str(level).replace('], ', '], \n').replace('], ', '').replace('[', '').replace(']', '').replace(' ', ''))

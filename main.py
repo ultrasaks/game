@@ -29,7 +29,7 @@ true_scroll = [0, 0]
 
 old_Inventory = None
 
-level = 2
+level = 6
 cutscenes = {0: [[410, 'Игрок бегает на кнопки [A]|[D] и [←]|[→]'], [300, 'Прыжок совершается на [W] или [↑]']],
              1: [[300, 'У тебя в руке меч, это значит что ты можешь бить им на [SPACE] или [↓]']]}
 isCutscene = False
@@ -67,13 +67,15 @@ def kick():
 
 def startup():
     global kicks, players, decoration_group, enemies, decoration_mobs, abilities_group, all_sprites, \
-        sprite, image, decorations, pickups, world_data, world, player, camera, ui, old_Inventory, cur_cutscene
+        sprite, image, decorations, pickups, world_data, world, player, camera, ui, old_Inventory, cur_cutscene, \
+        boss, bosses
     kicks = pygame.sprite.Group()
-
+    boss = None
     decoration_group = pygame.sprite.Group()
     enemies = pygame.sprite.Group()
     decoration_mobs = pygame.sprite.Group()
     abilities_group = pygame.sprite.Group()
+    bosses = pygame.sprite.Group()
 
     all_sprites = pygame.sprite.Group()
     sprite = pygame.sprite.Sprite()
@@ -108,24 +110,26 @@ def startup():
         if player.hp > 0:
             old_Inventory = [player.defence, player.hp, player.damage]
         players.empty()
-        player = world.process_data(world_data, decorations, enemies, pickups, old_Inventory)
+        player, boss = world.process_data(world_data, decorations, enemies, pickups, old_Inventory)
     else:
-        player = world.process_data(world_data, decorations, enemies, pickups)
+        player, boss = world.process_data(world_data, decorations, enemies, pickups)
     old_Inventory = [player.defence, player.hp, player.damage]
     for i in range(50):
         bird = Bird(random.randint(50, 2000), random.randint(-6000, 0))
         decoration_mobs.add(bird)
 
     players.add(player)
-
     camera = Camera()
     ui = UI()
     cur_cutscene = 0
 
+    if boss is not None:
+        bosses.add(boss)
+
 
 if __name__ == '__main__':
     global kicks, players, decoration_group, enemies, decoration_mobs, abilities_group, all_sprites, \
-        sprite, image, decorations, pickups, world_data, world, player, camera, ui, cur_cutscene
+        sprite, image, decorations, pickups, world_data, world, player, camera, ui, cur_cutscene, boss
     pygame.init()
     pygame.display.set_caption('Test')
     font_cutscene = pygame.font.SysFont('Tahoma', 15)
@@ -157,6 +161,7 @@ if __name__ == '__main__':
     color_hp = (21, 143, 26)
 
     while running:
+        # print(true_scroll)
         if newLevel:
             level += 1
             startup()
@@ -183,6 +188,27 @@ if __name__ == '__main__':
 
             enemies.draw(display)
             player.draw(display)
+
+            if boss is not None:
+                for bossK in bosses:  # без группы и следования по спрайтам в ней нельзя удалить спрайт, спасибо пайгейм
+                    bossK.draw(display)
+                    bossK.update(scroll)
+                    bossK.move(player, scroll_data)
+
+                    if pygame.sprite.spritecollide(bossK, players, False):
+                        if bossK.contact == 5:
+                            if not a:
+                                color_hp = (21, 143, 26)
+                                player.kick(bossK)
+                                bossK.contact = 0
+                            else:
+                                color_hp = (20, 30, 255)
+                        bossK.contact += 1
+                    else:
+                        bossK.contact = 0
+                    if pygame.sprite.spritecollide(bossK, kicks, False):
+                        bossK.kick(player)
+
 
             abilities_group.draw(display)
             ui.draw_hp(player, display, color_hp)

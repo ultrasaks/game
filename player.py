@@ -141,8 +141,7 @@ class Player(pygame.sprite.Sprite):
         if self.mana_count >= 10:
             self.mana = True
             self.mana_count = 0
-        display.blit(pygame.transform.flip(
-            self.image, self.flip, False), self.rect)
+        display.blit(pygame.transform.flip(self.image, self.flip, False), self.rect)
 
     def update(self, scroll):
         self.rect.x -= scroll[0]
