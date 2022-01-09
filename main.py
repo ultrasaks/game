@@ -10,8 +10,10 @@ from pygame.locals import *
 import ability
 from Utilities.load_image import load_image
 from player import Player
+from items.item import Item
 from Utilities.camera import Camera
 from Utilities.constants import *
+from items.runes import *
 from bird import Bird
 
 from ability import Ability
@@ -26,9 +28,9 @@ newLevel = False
 scroll_data = []
 scroll = [0, 0]
 true_scroll = [0, 0]
-level = 1
-cutscenes = {0: [[20, 'Игрок бегает на кнопки [A]|[D] и [←]|[→]'], [20, 'Прыжок совершается на [W] или [↑]']],
-             1: [[300, 'У тебя в руке меч, это значит что ты можешь бить им на [SPACE] или [↓]']]}
+level = 0
+cutscenes = {0: [[200, 'Игрок бегает на кнопки [A]|[D] и [←]|[→]'], [20, 'Прыжок совершается на [W] или [↑]']],
+             1: [[5, 'У тебя в руке меч, это значит что ты можешь бить им на [SPACE] или [↓]']]}
 isCutscene = False
 
 
@@ -74,7 +76,8 @@ def startup():
 
     all_sprites = pygame.sprite.Group()
     sprite = pygame.sprite.Sprite()
-    image = pygame.transform.scale(load_image("enemy/slime/jump.png"), (15, 15))
+    image = pygame.transform.scale(
+        load_image("enemy/slime/jump.png"), (15, 15))
     sprite.image = image
     sprite.rect = image.get_rect()
     all_sprites.add(sprite)
@@ -104,7 +107,8 @@ def startup():
     if players:
         players.empty()
         print(player.defence, player.hp)
-        player = world.process_data(world_data, decorations, enemies, pickups, [player.defence, player.hp, player.damage])
+        player = world.process_data(world_data, decorations, enemies, pickups, [
+                                    player.defence, player.hp, player.damage])
     else:
         player = world.process_data(world_data, decorations, enemies, pickups)
     for i in range(50):
@@ -118,6 +122,7 @@ def startup():
 
 
 if __name__ == '__main__':
+    jumper = 0
     global kicks, players, decoration_group, enemies, decoration_mobs, abilities_group, all_sprites, \
         sprite, image, decorations, pickups, world_data, world, player, camera, ui
     pygame.init()
@@ -125,7 +130,8 @@ if __name__ == '__main__':
     font_cutscene = pygame.font.SysFont('Tahoma', 15)
 
     players = pygame.sprite.Group()
-
+    runes = pygame.sprite.Group()
+    poisons = pygame.sprite.Group()
     clock = pygame.time.Clock()
     screen = pygame.display.set_mode(SCREEN_SIZE, 0, 32)
     display = pygame.Surface(DISPLAY_SIZE, 0, 32)
@@ -165,7 +171,8 @@ if __name__ == '__main__':
                 color_hp = (21, 143, 26)
             else:
                 color_hp = (20, 30, 255)
-            scroll_data = camera.obstacle_list(world, scroll, decorations, pickups)
+            scroll_data = camera.obstacle_list(
+                world, scroll, decorations, pickups)
             draw_bg()
             decoration_mobs.draw(display)
             world.draw(display, scroll_data)
@@ -175,14 +182,17 @@ if __name__ == '__main__':
 
             for i in abilities_group:
                 i.draw2(display)
-
+            runes.draw(display)
+            poisons.draw(display)
             enemies.draw(display)
             player.draw(display)
 
             abilities_group.draw(display)
             ui.draw_hp(player, display, color_hp)
             ui.draw_mana(display, player)
-
+            if player.rune:
+                ui.draw_runes(display, player)
+            ui.draw_rnes_window(display)
             ui.debug_mode(display, kicks, clock)
             for mob in decoration_mobs:
                 mob.update(scroll)
@@ -191,8 +201,9 @@ if __name__ == '__main__':
             player.update(scroll)
             if not isCutscene:
                 for enemy in enemies:
+                    enemy.draw_hp(display)
                     if pygame.sprite.spritecollide(enemy, kicks, False):
-                        enemy.kick(player)
+                        enemy.kick(player, runes, poisons)
 
                     if pygame.sprite.spritecollide(enemy, players, False):
                         if enemy.contact == 5:
@@ -210,22 +221,38 @@ if __name__ == '__main__':
 
                 if player.alive:
                     player.move(moving_left, moving_right, scroll_data)
+
+                for item in runes:
+                    item.update(scroll)
+                    item.move(scroll_data)
+                    item.proverka(player, display, ui)
+
+                for poison in poisons:
+                    poison.update(scroll)
+                    poison.move(scroll_data)
+                    if pygame.sprite.spritecollide(poison, players, False):
+                        poison.poison_baf(player)
+
             else:
                 for enemy in enemies:
                     enemy.update(scroll)
                 if cutscenes[level][0][0] > 0:
                     cutscenes[level][0][0] -= 1
 
-                    textsurface = font_cutscene.render(cutscenes[level][0][1], False, (255, 255, 0))
-                    display.blit(textsurface, (player.rect.x - len(cutscenes[level][0][1]) * 3, player.rect.y - 100))
+                    textsurface = font_cutscene.render(
+                        cutscenes[level][0][1], False, (255, 255, 0))
+                    display.blit(
+                        textsurface, (player.rect.x - len(cutscenes[level][0][1]) * 3, player.rect.y - 100))
                 else:
+                    jumper += 1
                     isCutscene = False
                     cutscenes[level].pop(0)
 
             if pygame.sprite.spritecollide(player, pickups.pickups_group, False):
                 for pickup in pickups.pickups_group:
                     if pygame.sprite.spritecollide(pickup, players, False):
-                        newLevel, isCutscene = pickup.touch(player, newLevel, isCutscene)
+                        newLevel, isCutscene = pickup.touch(
+                            player, newLevel, isCutscene)
 
             kicks.empty()
 
@@ -234,13 +261,12 @@ if __name__ == '__main__':
                 i.move(player, scroll)
                 i.clocker()
 
-            true_scroll[0] = (player.rect.center[0] - true_scroll[0] - A_scroll) // 15
-            true_scroll[1] = (player.rect.center[1] - true_scroll[1] - B_scroll) // 15
+            true_scroll[0] = (player.rect.center[0] -
+                              true_scroll[0] - A_scroll) // 15
+            true_scroll[1] = (player.rect.center[1] -
+                              true_scroll[1] - B_scroll) // 15
             scroll = true_scroll.copy()
             scroll[0], scroll[1] = int(scroll[0]), int(scroll[1])
-
-
-
 
         else:
             # moving_left = False
@@ -278,22 +304,42 @@ if __name__ == '__main__':
                         moving_left = True
                     if event.key in [K_d, K_RIGHT]:
                         moving_right = True
-                    if event.key in [K_w, K_UP] and player.alive and (
-                            not player.in_air or player.doubleJ):
-                        if not player.in_air:
-                            jump_sound.play()
-                        else:
-                            jump2_sound.play()
-                        player.jump = True
-                    if event.key in [K_SPACE, K_DOWN]:
-                        kick_sound.play()
-                        kick()
+                    if jumper >= 2:
+                        if event.key in [K_w, K_UP] and player.alive and (
+                                not player.in_air or player.doubleJ and player.rune_type == "jump"):
+                            if not player.in_air:
+                                jump_sound.play()
+                            else:
+                                jump2_sound.play()
+                            player.jump = True
+                    if level != 0:
+                        if event.key in [K_SPACE, K_DOWN]:
+                            kick_sound.play()
+                            kick()
                 if event.key in [K_ESCAPE]:
                     running = False
                 if event.key in [K_TAB]:
-                    if player.mana:
+                    if player.mana_count == 7:
                         pause = True
                         eventer = "ability"
+                if event.key in [K_e] and player.rune_true:
+                    for i in runes:
+                        player.rune = True
+                        player.rune_type = i.type_rune
+                        i.kill()
+                if event.key in [K_g]:
+                    ff = 0
+                    if player.flip is False:
+                        ff = 10
+                    else:
+                        ff = -10
+                    rune = Rune(player.rect.x, player.rect.y,
+                                ff, player.rune_type)
+                    runes.add(rune)
+                    player.speed = player.speed_2
+                    player.rune = False
+                    player.rune_type = ""
+
             if event.type == KEYUP:
                 if event.key in [K_a, K_LEFT]:
                     moving_left = False

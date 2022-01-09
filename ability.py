@@ -5,8 +5,10 @@ from Utilities.constants import *
 
 
 class Shield(pygame.sprite.Sprite):
-    image_shield = pygame.transform.scale(load_image("abilities/ability111.png"), (60, 60))
-    image_shield2 = pygame.transform.scale(load_image("abilities/ability110.png"), (40, 40))
+    image_shield = pygame.transform.scale(
+        load_image("abilities/ability111.png"), (60, 60))
+    image_shield2 = pygame.transform.scale(
+        load_image("abilities/ability110.png"), (40, 40))
 
     def __init__(self, player, *group):
         super().__init__(*group)
@@ -14,7 +16,8 @@ class Shield(pygame.sprite.Sprite):
         self.image = Shield.image_shield
         self.rect = self.image.get_rect()
         self.rect2 = self.image2.get_rect()
-        self.rect2.x, self.rect2.y = (player.rect.center[0] - 15, player.rect.center[1] - 40)
+        self.rect2.x, self.rect2.y = (
+            player.rect.center[0] - 15, player.rect.center[1] - 40)
         self.rect.center = player.rect.center
         self.mask = pygame.mask.from_surface(self.image)
         self.true = True
@@ -25,7 +28,8 @@ class Shield(pygame.sprite.Sprite):
     def move(self, player, scroll):
         self.flip = player.flip
         self.rect.center = player.rect.center
-        self.rect2.x, self.rect2.y = (player.rect.center[0] - 15, player.rect.y - 40)
+        self.rect2.x, self.rect2.y = (
+            player.rect.center[0] - 15, player.rect.y - 40)
 
     def draw(self, display):
         display.blit(self.image, self.rect)
@@ -50,8 +54,10 @@ class Shield(pygame.sprite.Sprite):
 
 
 class Sword(pygame.sprite.Sprite):
-    image_sword_right = pygame.transform.scale(load_image("abilities/ability000.png"), (60, 60))
-    image_sword_left = pygame.transform.scale(load_image("abilities/ability001.png"), (60, 60))
+    image_sword_right = pygame.transform.scale(
+        load_image("abilities/ability000.png"), (60, 60))
+    image_sword_left = pygame.transform.scale(
+        load_image("abilities/ability001.png"), (60, 60))
 
     def __init__(self, player, *group):
         super().__init__(*group)
@@ -101,17 +107,24 @@ class Sword(pygame.sprite.Sprite):
 class Ability():
     def __init__(self):
         self.display = pygame.Surface(DISPLAY_SIZE)
-        self.background = pygame.transform.scale(load_image("abilities/background_dop.png"), DISPLAY_SIZE).convert_alpha()
-        self.image00 = pygame.transform.scale(load_image("abilities/ability00.png"), (256 / 2, 384 / 2)).convert_alpha()
-        self.image01 = pygame.transform.scale(load_image("abilities/ability01.png"), (256 / 2, 384 / 2)).convert_alpha()
-        self.image10 = pygame.transform.scale(load_image("abilities/ability10.png"), (256 / 2, 384 / 2)).convert_alpha()
-        self.image11 = pygame.transform.scale(load_image("abilities/ability11.png"), (256 / 2, 384 / 2)).convert_alpha()
+        self.background = pygame.transform.scale(load_image(
+            "abilities/background_dop.png"), DISPLAY_SIZE).convert_alpha()
+        self.image00 = pygame.transform.scale(load_image(
+            "abilities/ability00.png"), (256 / 2, 384 / 2)).convert_alpha()
+        self.image01 = pygame.transform.scale(load_image(
+            "abilities/ability01.png"), (256 / 2, 384 / 2)).convert_alpha()
+        self.image10 = pygame.transform.scale(load_image(
+            "abilities/ability10.png"), (256 / 2, 384 / 2)).convert_alpha()
+        self.image11 = pygame.transform.scale(load_image(
+            "abilities/ability11.png"), (256 / 2, 384 / 2)).convert_alpha()
         self.image1 = self.image00
         self.image2 = self.image10
         self.rect1 = self.image1.get_rect()
         self.rect2 = self.image2.get_rect()
-        self.rect1.x, self.rect1.y = (DISPLAY_SIZE[0] // 2 // 2, DISPLAY_SIZE[1] // 2 // 2)
-        self.rect2.x, self.rect2.y = (self.rect1.x + 300, DISPLAY_SIZE[1] // 2 // 2)
+        self.rect1.x, self.rect1.y = (
+            DISPLAY_SIZE[0] // 2 // 2, DISPLAY_SIZE[1] // 2 // 2)
+        self.rect2.x, self.rect2.y = (
+            self.rect1.x + 300, DISPLAY_SIZE[1] // 2 // 2)
 
     def update(self, player, ui):
         ability = 0
@@ -121,6 +134,7 @@ class Ability():
                 if i.type == MOUSEBUTTONDOWN:
                     ability = Sword(player)
                     player.mana = False
+                    player.mana_count = 0
                     ui.NN = 0
         else:
             self.image1 = self.image00
@@ -130,6 +144,7 @@ class Ability():
                 if i.type == MOUSEBUTTONDOWN:
                     ability = Shield(player)
                     player.mana = False
+                    player.mana_count = 0
                     ui.NN = 0
         else:
             self.image2 = self.image10

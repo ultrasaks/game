@@ -6,6 +6,8 @@ import pygame
 from pygame.locals import *
 from Utilities.constants import *
 from Utilities.load_image import load_image
+from items.poisons import Poison
+from items.runes import *
 import random
 
 # slime
@@ -104,24 +106,50 @@ class RageSlime(pygame.sprite.Sprite):
         self.rect.x += dx
         self.rect.y += dy
 
-    def kick(self, player):
+    def kick(self, player, groups, groups2):
         self.NN = 0
         self.hp -= random.randint(player.damage[0], player.damage[1])
         self.player_flip = player.flip
         print(f'Слайм получил урон|{self.hp}')
         if self.hp <= 0:
-            player.mana_count += 3
+            if player.mana_count < 7:
+                player.mana_count += 1
             self.kill()
+            b = random.randin(0, 20)
+            if b == 20:
+                rune = Rune(self.rect.x, self.rect.y, 0,
+                            random.choice(["speed", "jump"]))
+                groups.add(rune)
+            elif b in [18, 2]:
+                poison = Poison(self.rect.x, self.rect.y + 18, 0, random.choice(
+                    ["heal", "mana", "heal", "regen", "mana", "heal", "mana", "heal", "regen", "mana", "super", "super"]))
+                groups2.add(poison)
 
-    def kicks(self, player):
+    def kicks(self, player, groups, groups2):
         self.NN = 0
         self.hp -= random.choice(player)
-        self.flip = False
+        self.flip = self.flips
         print(f'Слайм получил урон|{self.hp}')
         if self.hp <= 0:
-
+            if player.mana_count < 7:
+                player.mana_count += 1
             self.kill()
+            b = random.randin(0, 10)
+            if b == 0:
+                rune = Rune(self.rect.x, self.rect.y, 0,
+                            random.choice(["speed", "jump"]))
+                groups.add(rune)
+            elif b in [10]:
+                poison = Poison(self.rect.x, self.rect.y + 18, 0,
+                                random.choice(["heal", "mana", "heal", "regen", "mana", "heal", "mana", "heal", "regen", "mana", "super", "super"]))
+                groups2.add(poison)
 
     def update(self, scroll):
         self.rect.x -= scroll[0]
         self.rect.y -= scroll[1]
+
+    def draw_hp(self, display):
+        pygame.draw.rect(display, (215, 24, 44),
+                         (self.rect.center[0] - 25, self.rect.y - 5, 50, 5))
+        pygame.draw.rect(display, (21, 143, 26),
+                         (self.rect.center[0] - 25, self.rect.y - 5, self.hp * 0.5, 5))
