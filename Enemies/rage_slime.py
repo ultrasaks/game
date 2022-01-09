@@ -115,7 +115,8 @@ class RageSlime(pygame.sprite.Sprite):
             if player.mana_count < 7:
                 player.mana_count += 1
             self.kill()
-            b = random.randin(0, 20)
+            
+            b = random.randint(0, 20)
             if b == 20:
                 rune = Rune(self.rect.x, self.rect.y, 0,
                             random.choice(["speed", "jump"]))

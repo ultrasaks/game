@@ -120,7 +120,8 @@ class Slime(pygame.sprite.Sprite):
             if player.mana_count < 7:
                 player.mana_count += 1
             self.kill()
-            b = random.randin(0, 40)
+            
+            b = random.randint(0, 40)
             if b == 34:
                 rune = Rune(self.rect.x, self.rect.y, 0,
                             random.choice(["speed", "jump"]))

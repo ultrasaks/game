@@ -149,8 +149,7 @@ class Player(pygame.sprite.Sprite):
         # print("Герой крыс получил урон")
 
     def draw(self, display):
-        display.blit(pygame.transform.flip(
-            self.image, self.flip, False), self.rect)
+        display.blit(pygame.transform.flip(self.image, self.flip, False), self.rect)
 
     def update(self, scroll):
         self.rect.x -= scroll[0]
