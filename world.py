@@ -24,7 +24,7 @@ class World:
         for y, row in enumerate(data):
             for x, tile in enumerate(row):
                 if tile >= 0:
-                    if tile < 500:
+                    if tile < 700:
                         if 500 <= tile < 700:
                             img = self.decor_list[tile - 500]
                         else:
@@ -33,7 +33,6 @@ class World:
                         img_rect.x = x * TILE_SIZE
                         img_rect.y = y * TILE_SIZE
                         tile_data = (img, img_rect)
-
                     if 0 <= tile < 500 and tile != 15:
                         self.obstacle_list.append(tile_data)
                     elif 500 <= tile < 700:

@@ -185,7 +185,6 @@ if __name__ == '__main__':
             draw_bg()
             decoration_mobs.draw(display)
             world.draw(display, scroll_data)
-            decorations.decoration_group.draw(display)
 
             pickups.pickups_group.draw(display)
 
@@ -195,6 +194,7 @@ if __name__ == '__main__':
             poisons.draw(display)
             enemies.draw(display)
             player.draw(display)
+            decorations.decoration_group.draw(display)
 
             if boss is not None:
                 for bossK in bosses:  # без группы и следования по спрайтам в ней нельзя удалить спрайт, спасибо пайгейм
@@ -332,14 +332,12 @@ if __name__ == '__main__':
                         moving_left = True
                     if event.key in [K_d, K_RIGHT]:
                         moving_right = True
-                    if jumper >= 2:
-                        if event.key in [K_w, K_UP] and player.alive and (
-                                not player.in_air or player.doubleJ and player.rune_type == "jump"):
-                            if not player.in_air:
-                                jump_sound.play()
-                            else:
-                                jump2_sound.play()
-                            player.jump = True
+                    if event.key in [K_w, K_UP] and player.alive and (not player.in_air or player.doubleJ and player.rune_type == "jump"):
+                        if not player.in_air:
+                            jump_sound.play()
+                        else:
+                            jump2_sound.play()
+                        player.jump = True
                     if level != 0:
                         if event.key in [K_SPACE, K_DOWN]:
                             kick_sound.play()
@@ -361,8 +359,7 @@ if __name__ == '__main__':
                         ff = 10
                     else:
                         ff = -10
-                    rune = Rune(player.rect.x, player.rect.y,
-                                ff, player.rune_type)
+                    rune = Rune(player.rect.x, player.rect.y,ff, player.rune_type)
                     runes.add(rune)
                     player.speed = player.speed_2
                     player.rune = False
