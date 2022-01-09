@@ -16,6 +16,7 @@ class UI:
             load_image("UI/e_1.png"), (10, 10)).convert_alpha()
         self.true = True
         self.font_debug = pygame.font.SysFont('sprites/8514fixr.fon', 50)
+        self.font = pygame.font.SysFont('8514fixr', 30)
 
     def draw_hp(self, player, display, color_hp=(21, 143, 26)):
         pygame.draw.rect(display, (215, 24, 44), (5, 5, 200, 20))
@@ -33,10 +34,10 @@ class UI:
         display.blit(textsurface, (210, 5))
 
     def draw_mana(self, display, player):
-        font = pygame.font.SysFont('8514fixr', 30)
+        if player.mana_count > 7:
+            player.mana_count = 7  # КАКОГО БЛЯТЬ ХУЯ
         text = f"{player.mana_count}/7"
-        textsurface = font.render(text, False, (240, 240, 240))
-
+        textsurface = self.font.render(text, False, (240, 240, 240))
         self.image = pygame.transform.scale(load_image(f"UI/mana{player.mana_count + 1}.png"), (50, 50)).convert_alpha()
         display.blit(
             self.image, (DISPLAY_SIZE[0] - 60, DISPLAY_SIZE[1] - DISPLAY_SIZE[1] + 15))
