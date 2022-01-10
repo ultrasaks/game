@@ -28,7 +28,7 @@ newLevel = False
 scroll_data = []
 scroll = [0, 0]
 true_scroll = [0, 0]
-level = 0
+level = 2
 cutscenes = {0: [[200, 'Игрок бегает на кнопки [A]|[D] и [←]|[→]'], [20, 'Прыжок совершается на [W] или [↑]']],
              1: [[5, 'У тебя в руке меч, это значит что ты можешь бить им на [SPACE] или [↓]']]}
 isCutscene = False
@@ -202,8 +202,10 @@ if __name__ == '__main__':
             if not isCutscene:
                 for enemy in enemies:
                     enemy.draw_hp(display)
+                    for i in abilities_group:
+                        i.kick(enemy, runes, poisons, i, False)
                     if pygame.sprite.spritecollide(enemy, kicks, False):
-                        enemy.kick(player, runes, poisons)
+                        enemy.kick(player, runes, poisons, True)
 
                     if pygame.sprite.spritecollide(enemy, players, False):
                         if enemy.contact == 5:
@@ -218,6 +220,8 @@ if __name__ == '__main__':
                         enemy.contact = 0
                     enemy.update(scroll)
                     enemy.move(player, scroll_data)
+
+
 
                 if player.alive:
                     player.move(moving_left, moving_right, scroll_data)
@@ -327,7 +331,7 @@ if __name__ == '__main__':
                         player.rune = True
                         player.rune_type = i.type_rune
                         i.kill()
-                if event.key in [K_g]:
+                if event.key in [K_g] and player.rune is True:
                     ff = 0
                     if player.flip is False:
                         ff = 10

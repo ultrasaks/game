@@ -23,7 +23,7 @@ class Shield(pygame.sprite.Sprite):
         self.true = True
         self.NN = 0
         self.flip = False
-        self.damage = [0, 1, 2]
+        self.damage = [0, 2]
 
     def move(self, player, scroll):
         self.flip = player.flip
@@ -37,9 +37,9 @@ class Shield(pygame.sprite.Sprite):
     def draw2(self, display):
         display.blit(self.image2, self.rect2)
 
-    def kick(self, mobs):
+    def kick(self, mobs, g1, g2, atack, f):
         if pygame.sprite.collide_mask(self, mobs):
-            mobs.kicks(self.damage)
+            mobs.kick(atack, g1, g2, f)
 
     def clocker(self):
         self.NN += 1
@@ -72,7 +72,7 @@ class Sword(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = player.rect.center
         self.mask = pygame.mask.from_surface(self.image)
-        self.damage = [300, 200, 250, 350, 500, 100, 1]
+        self.damage = [100, 300]
         self.true = True
         self.NN = 0
 
@@ -90,9 +90,9 @@ class Sword(pygame.sprite.Sprite):
         self.rect.x -= scroll[0]
         self.rect.y -= scroll[1]
 
-    def kick(self, mobs):
+    def kick(self, mobs, g1, g2, atack, f):
         if pygame.sprite.collide_mask(self, mobs):
-            mobs.kicks(self.damage)
+            mobs.kick(atack, g1, g2,f)
             self.kill()
 
     def clocker(self):

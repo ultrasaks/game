@@ -32,9 +32,9 @@ class Player(pygame.sprite.Sprite):
         self.mana = True
         self.mana_count = 7
         self.mana_respawn = 0
-        self.rune_true = False
-        self.rune = False
-        self.rune_type = ""
+        self.rune_true = True
+        self.rune = True
+        self.rune_type = "jump"
         self.regen = False
         self.regen_count = 0
 

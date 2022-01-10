@@ -106,16 +106,17 @@ class RageSlime(pygame.sprite.Sprite):
         self.rect.x += dx
         self.rect.y += dy
 
-    def kick(self, player, groups, groups2):
+    def kick(self, player, groups, groups2, f):
         self.NN = 0
         self.hp -= random.randint(player.damage[0], player.damage[1])
         self.player_flip = player.flip
         print(f'Слайм получил урон|{self.hp}')
         if self.hp <= 0:
-            if player.mana_count < 7:
-                player.mana_count += 1
+            if f:
+                if player.mana_count < 7:
+                    player.mana_count += 1
             self.kill()
-            b = random.randin(0, 20)
+            b = random.randint(0, 20)
             if b == 20:
                 rune = Rune(self.rect.x, self.rect.y, 0,
                             random.choice(["speed", "jump"]))
@@ -125,24 +126,6 @@ class RageSlime(pygame.sprite.Sprite):
                     ["heal", "mana", "heal", "regen", "mana", "heal", "mana", "heal", "regen", "mana", "super", "super"]))
                 groups2.add(poison)
 
-    def kicks(self, player, groups, groups2):
-        self.NN = 0
-        self.hp -= random.choice(player)
-        self.flip = self.flips
-        print(f'Слайм получил урон|{self.hp}')
-        if self.hp <= 0:
-            if player.mana_count < 7:
-                player.mana_count += 1
-            self.kill()
-            b = random.randin(0, 10)
-            if b == 0:
-                rune = Rune(self.rect.x, self.rect.y, 0,
-                            random.choice(["speed", "jump"]))
-                groups.add(rune)
-            elif b in [10]:
-                poison = Poison(self.rect.x, self.rect.y + 18, 0,
-                                random.choice(["heal", "mana", "heal", "regen", "mana", "heal", "mana", "heal", "regen", "mana", "super", "super"]))
-                groups2.add(poison)
 
     def update(self, scroll):
         self.rect.x -= scroll[0]
