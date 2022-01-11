@@ -14,6 +14,7 @@ from items.item import Item
 from Utilities.camera import Camera
 from Utilities.constants import *
 from items.runes import *
+from Enemies.eyes import *
 from bird import Bird
 
 from ability import Ability
@@ -38,6 +39,8 @@ cutscenes = {0: [[410, 'Игрок бегает на кнопки [A]|[D] и [�
              1: [[300, 'У тебя в руке меч, это значит что ты можешь бить им на [SPACE] или [↓]']]}
 
 isCutscene = False
+
+
 
 
 img_list = []
@@ -240,6 +243,9 @@ if __name__ == '__main__':
                         i.kick(enemy, runes, poisons, i, False)
                     if pygame.sprite.spritecollide(enemy, kicks, False):
                         enemy.kick(player, runes, poisons, True)
+                        if enemy.type_enemy == "eye" and enemy.alive is False and random.randint(0, 10) == 2:
+                            enemies.add(BadEye(enemy.rect.x, enemy.rect.y, player))
+
 
                     if pygame.sprite.spritecollide(enemy, players, False):
                         if enemy.contact == 5:

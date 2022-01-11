@@ -8,7 +8,6 @@ from Utilities.constants import *
 from Utilities.load_image import load_image
 import random
 
-# slime
 
 
 class Boss(pygame.sprite.Sprite):
@@ -27,8 +26,8 @@ class Boss(pygame.sprite.Sprite):
         self.in_air = False
         self.flip = False
         self.alive = True
-        self.hp = 450
-        self.damage = 20
+        self.hp = 750
+        self.damage = 30
         self.width = self.image.get_width()
         self.height = self.image.get_height()
 
@@ -73,9 +72,17 @@ class Boss(pygame.sprite.Sprite):
             dy += GRAVITY_SLIME + 1.5
 
         for tile in world:
-            # check collision in the x direction
+            if dx < 0:
+                a = dx - 15
+            else:
+                a = dx + 15
+            if tile[1].colliderect(self.rect.x + a, self.rect.y, self.width, self.height):
+                dy = -15
             if tile[1].colliderect(self.rect.x + dx, self.rect.y, self.width, self.height):
                 dx = 0
+
+
+
             # check for collision in the y direction
             if tile[1].colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
                 # check if below the ground, i.e. jumping
