@@ -41,9 +41,11 @@ class Shield(pygame.sprite.Sprite):
         if pygame.sprite.collide_mask(self, mobs):
             mobs.kick(atack, g1, g2, f)
 
-    def clocker(self):
+    def clocker(self, player):
         self.NN += 1
+        player.defence_dop = 0
         if self.NN >= 480:
+            player.defence_dop = 1
             self.kill()
 
     def update(self, scroll):
@@ -95,7 +97,7 @@ class Sword(pygame.sprite.Sprite):
             mobs.kick(atack, g1, g2,f)
             self.kill()
 
-    def clocker(self):
+    def clocker(self, player):
         self.NN += 1
         if self.NN >= 30:
             self.kill()

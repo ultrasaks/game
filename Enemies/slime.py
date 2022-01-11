@@ -47,6 +47,7 @@ class Slime(pygame.sprite.Sprite):
 
         self.NN = 61
         self.player_flip = True
+        self.type_enemy = "slime"
 
     def move(self, player, world, tolchok=0):
         dx = 0
@@ -121,6 +122,7 @@ class Slime(pygame.sprite.Sprite):
                 if player.mana_count < 7:
                     player.mana_count += 1
             self.kill()
+
             b = random.randint(0, 40)
             if b == 34:
                 rune = Rune(self.rect.x, self.rect.y, 0,

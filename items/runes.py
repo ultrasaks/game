@@ -16,6 +16,10 @@ class Rune(pygame.sprite.Sprite):
             self.type_rune = "jump"
             self.image = pygame.transform.scale(load_image(
                 "item/rune_jump.png"), (30, 30)).convert_alpha()
+        else:  # ToDo: ЧТО ТЫ БЛЯТЬ СДЕЛАЛ ОНО ЖЕ ВСЁ ЛОМАЕТСЯ НА G
+            self.type_rune = "jump"
+            self.image = pygame.transform.scale(load_image(
+                "item/rune_jump.png"), (30, 30)).convert_alpha()
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y

@@ -28,13 +28,14 @@ class Player(pygame.sprite.Sprite):
         self.doubleJ = False
 
         self.defence = 1  # потом
+        self.defence_dop = 1
         self.damage = [15, 30]
         self.mana = True
         self.mana_count = 7
         self.mana_respawn = 0
-        self.rune_true = True
-        self.rune = True
-        self.rune_type = "jump"
+        self.rune_true = False
+        self.rune = False
+        self.rune_type = ""
         self.regen = False
         self.regen_count = 0
 
@@ -142,15 +143,14 @@ class Player(pygame.sprite.Sprite):
 
     def kick(self, enemy):
         if self.delay == 0:
-            self.hp -= enemy.damage * self.defence
+            self.hp -= enemy.damage * self.defence * self.defence_dop
             self.delay = 50
         if self.hp <= 0:
             self.alive = False
         # print("Герой крыс получил урон")
 
     def draw(self, display):
-        display.blit(pygame.transform.flip(
-            self.image, self.flip, False), self.rect)
+        display.blit(pygame.transform.flip(self.image, self.flip, False), self.rect)
 
     def update(self, scroll):
         self.rect.x -= scroll[0]
