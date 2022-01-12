@@ -31,10 +31,9 @@ scroll = [0, 0]
 true_scroll = [0, 0]
 
 
-
 old_Inventory = None
 
-level = 1
+level = 2
 cutscenes = {0: [[410, 'Игрок бегает на кнопки [A]|[D] и [←]|[→]'], [300, 'Прыжок совершается на [W] или [↑]']],
              1: [[300, 'У тебя в руке меч, это значит что ты можешь бить им на [SPACE] или [↓]']]}
 
@@ -271,10 +270,6 @@ if __name__ == '__main__':
                             i.kill()
                         i.update(scroll)
                         i.move(player, scroll_data)
-
-
-
-
 
                 if player.alive:
                     player.move(moving_left, moving_right, scroll_data)
