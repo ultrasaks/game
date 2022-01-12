@@ -108,6 +108,8 @@ class Sword(pygame.sprite.Sprite):
 
 class Ability():
     def __init__(self):
+        self.s1 = pygame.mixer.Sound("sounds/sword.wav")
+        self.s2 = pygame.mixer.Sound("sounds/shield.wav")
         self.display = pygame.Surface(DISPLAY_SIZE)
         self.background = pygame.transform.scale(load_image(
             "abilities/background_dop.png"), DISPLAY_SIZE).convert_alpha()
@@ -134,6 +136,7 @@ class Ability():
             self.image1 = self.image01
             for i in pygame.event.get():
                 if i.type == MOUSEBUTTONDOWN:
+                    self.s1.play()
                     ability = Sword(player)
                     player.mana = False
                     player.mana_count = 0
@@ -145,6 +148,7 @@ class Ability():
             for i in pygame.event.get():
                 if i.type == MOUSEBUTTONDOWN:
                     ability = Shield(player)
+                    self.s2.play()
                     player.mana = False
                     player.mana_count = 0
                     ui.NN = 0

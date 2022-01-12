@@ -35,7 +35,7 @@ class UI:
 
     def draw_mana(self, display, player):
         if player.mana_count > 7:
-            player.mana_count = 7  # КАКОГО БЛЯТЬ ХУЯ
+            player.mana_count = 7
         text = f"{player.mana_count}/7"
         textsurface = self.font.render(text, False, (240, 240, 240))
         self.image = pygame.transform.scale(load_image(f"UI/mana{player.mana_count + 1}.png"), (50, 50)).convert_alpha()
@@ -53,10 +53,10 @@ class UI:
         sprite = pygame.sprite.Sprite()
         if player.rune_type == "speed":
             sprite.image = pygame.transform.scale(load_image(
-                "item/rune_speed.png"), (40, 40)).convert_alpha()
+                "item/rune_speed.png"), (35, 35)).convert_alpha()
         if player.rune_type == "jump":
             sprite.image = pygame.transform.scale(load_image(
-                "item/rune_jump.png"), (40, 40)).convert_alpha()
+                "item/rune_jump.png"), (35, 35)).convert_alpha()
         sprite.rect = sprite.image.get_rect()
         sprite.rect.center = self.rect3.center
         group = pygame.sprite.Group()
@@ -70,3 +70,9 @@ class UI:
         textsurface = font.render(text, False, color)
         display.blit(textsurface, (object.x + 8, object.y - 17))
         display.blit(self.image4, (object.x - 8, object.y - 15))
+    def draw_marvin(self, display):
+        text = "Санек Marvin - облегчил твою душу!"
+        font = pygame.font.SysFont('pressstart', 22)
+        textsurface = font.render(text, False, (240, 240, 240))
+        display.blit(
+            textsurface, (DISPLAY_SIZE[0] - DISPLAY_SIZE[0] + 100, DISPLAY_SIZE[1] - 45))

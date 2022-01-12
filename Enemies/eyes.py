@@ -16,6 +16,7 @@ import random
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, x, y, player, scroll, speed=5,  *group):
         super().__init__(*group)
+        self.dead_sound = pygame.mixer.Sound("sounds/dead_enemy.wav")
         self.speed = speed
         self.vel_y = 0
         self.image = pygame.transform.scale(
@@ -49,7 +50,8 @@ class Bullet(pygame.sprite.Sprite):
         if self.NN >= 360:
             self.kill()
 
-    def kick(self, player, groups, groups2, f):
+    def kick(self):
+        self.dead_sound.play()
         self.kill()
 
     def update(self, scroll):
@@ -64,6 +66,7 @@ class Eye(pygame.sprite.Sprite):
 
     def __init__(self, x, y, speed=0, *group):
         super().__init__(*group)
+        self.dead_sound = pygame.mixer.Sound("sounds/dead_enemy.wav")
         self.speed = speed
         self.vel_y = 0
         self.image = pygame.transform.scale(
@@ -109,6 +112,7 @@ class Eye(pygame.sprite.Sprite):
         self.player_flip = player.flip
         print(f'Глазику не нравится|{self.hp}')
         if self.hp <= 0:
+            self.dead_sound.play()
             self.alive = False
             if f:
                 if player.mana_count < 7:
@@ -122,7 +126,7 @@ class Eye(pygame.sprite.Sprite):
                 groups.add(rune)
             elif b in [28, 2, 7]:
                 poison = Poison(self.rect.x, self.rect.y + 8, 0,
-                                random.choice(["heal", "mana", "heal", "regen", "mana", "heal", "mana", "heal", "regen", "mana", "super", "super"]))
+                                random.choice(["heal", "mana", "heal", "regen", "mana", "heal", "mana", "heal", "regen", "mana", "super", "super", "secret"]))
                 groups2.add(poison)
 
     def update(self, scroll):
@@ -140,6 +144,7 @@ class Eye(pygame.sprite.Sprite):
 class BadEye(pygame.sprite.Sprite):
     def __init__(self, x, y,player, speed=0, *group):
         super().__init__(*group)
+        self.dead_sound = pygame.mixer.Sound("sounds/dead_enemy.wav")
         self.speed = speed
         self.vel_y = 0
         self.image = pygame.transform.scale(
@@ -207,6 +212,7 @@ class BadEye(pygame.sprite.Sprite):
         self.colvo_bullet += 1
         print(f'ПЛОХОЙ ГЛАЗ ЗЛИТСЯ|{self.hp}')
         if self.hp <= 0:
+            self.dead_sound.play()
             self.bad_eye = None
             if f:
                 if player.mana_count < 7:
@@ -220,7 +226,7 @@ class BadEye(pygame.sprite.Sprite):
                 groups.add(rune)
             elif b == 34:
                 poison = Poison(self.rect.x, self.rect.y + 8, 0,
-                                random.choice(["heal", "mana", "heal", "regen", "mana", "heal", "mana", "heal", "regen", "mana", "super", "super"]))
+                                random.choice(["secret", "super", "secret"]))
                 groups2.add(poison)
 
     def update(self, scroll):

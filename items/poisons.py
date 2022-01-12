@@ -7,22 +7,32 @@ class Poison(pygame.sprite.Sprite):
     def __init__(self, x, y, speed, poison, *group):
         super().__init__(*group)
         self.type_poison = ""
+
         if poison == "heal":
             self.type_poison = "heal"
             self.image = pygame.transform.scale(load_image(
                 "item/poison_heal.png"), (15, 18)).convert_alpha()
+            self.sound_poison = pygame.mixer.Sound("sounds/poison.wav")
         elif poison == "regen":
             self.type_poison = "regen"
             self.image = pygame.transform.scale(load_image(
                 "item/poison_regen.png"), (5, 15)).convert_alpha()
+            self.sound_poison = pygame.mixer.Sound("sounds/poison.wav")
         elif poison == "mana":
             self.type_poison = "mana"
             self.image = pygame.transform.scale(load_image(
                 "item/poison_mana.png"), (15, 18)).convert_alpha()
+            self.sound_poison = pygame.mixer.Sound("sounds/poison.wav")
         elif poison == "super":
             self.type_poison = "super"
             self.image = pygame.transform.scale(load_image(
                 "item/poison_super.png"), (10, 15)).convert_alpha()
+            self.sound_poison = pygame.mixer.Sound("sounds/poison.wav")
+        elif poison == "secret":
+            self.type_poison = "secret"
+            self.image = pygame.transform.scale(load_image(
+                "item/Marvin-SHTF.png"), (30, 30)).convert_alpha()
+            self.sound_poison = pygame.mixer.Sound("sounds/secret_poison.wav")
 
         self.rect = self.image.get_rect()
         self.rect.x = x
@@ -87,5 +97,12 @@ class Poison(pygame.sprite.Sprite):
                 player.hp = 100
             else:
                 player.hp += 25
+        elif self.type_poison == "secret":
+            player.mana_count = 7
+            player.hp = 100
+            player.marvin = True
+        self.sound_poison.play()
+
+
 
         self.kill()

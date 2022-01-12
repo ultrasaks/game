@@ -30,6 +30,8 @@ scroll_data = []
 scroll = [0, 0]
 true_scroll = [0, 0]
 
+marvin_count = 0
+
 
 
 old_Inventory = None
@@ -155,7 +157,8 @@ if __name__ == '__main__':
     kick_sound = pygame.mixer.Sound("sounds/kick.wav")
     jump_sound = pygame.mixer.Sound("sounds/jump.wav")
     jump2_sound = pygame.mixer.Sound("sounds/djump.wav")
-    pygame.mixer.music.load("sounds/music.mp3")
+    pygame.mixer.music.load("sounds/music.wav")
+    bullet_kick = pygame.mixer.Sound("sounds/bullet_kick.wav")
     pygame.mixer.music.play(loops=-1, start=0.0, fade_ms=0)
     vol = 0.2
     pygame.mixer.music.set_volume(vol)
@@ -243,8 +246,9 @@ if __name__ == '__main__':
                         i.kick(enemy, runes, poisons, i, False)
                     if pygame.sprite.spritecollide(enemy, kicks, False):
                         enemy.kick(player, runes, poisons, True)
-                        if enemy.type_enemy == "eye" and enemy.alive is False and random.randint(0, 10) == 2:
+                        if enemy.type_enemy == "eye" and enemy.alive is False and random.randint(0, 10) == 10:
                             enemies.add(BadEye(enemy.rect.x, enemy.rect.y, player))
+
 
 
                     if pygame.sprite.spritecollide(enemy, players, False):
@@ -268,12 +272,20 @@ if __name__ == '__main__':
                     for i in bullet_group:
                         if pygame.sprite.spritecollide(i, players, False):
                             player.kick(i)
+                            bullet_kick.play()
                             i.kill()
+                        if pygame.sprite.spritecollide(i, kicks, False):
+                            i.kick()
                         i.update(scroll)
                         i.move(player, scroll_data)
 
 
-
+                if player.marvin:
+                    ui.draw_marvin(display)
+                    marvin_count += 1
+                    if marvin_count >= 90:
+                        player.marvin = False
+                        marvin_count = 0
 
 
                 if player.alive:
