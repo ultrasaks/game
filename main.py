@@ -4,6 +4,7 @@ import sys
 import random
 import csv
 from UI import UI
+from ast import literal_eval
 
 from pygame.locals import *
 
@@ -33,13 +34,11 @@ true_scroll = [0, 0]
 
 old_Inventory = None
 
-level = 2
+level = 3
 cutscenes = {0: [[410, 'Игрок бегает на кнопки [A]|[D] и [←]|[→]'], [300, 'Прыжок совершается на [W] или [↑]']],
              1: [[300, 'У тебя в руке меч, это значит что ты можешь бить им на [SPACE] или [↓]']]}
 
 isCutscene = False
-
-
 
 
 img_list = []
@@ -119,6 +118,9 @@ def startup():
             old_Inventory = [player.defence, player.hp, player.damage]
         players.empty()
         player, boss = world.process_data(world_data, decorations, enemies, pickups, old_Inventory)
+    elif old_Inventory:
+        players.empty()
+        player, boss = world.process_data(world_data, decorations, enemies, pickups, old_Inventory)
     else:
         player, boss = world.process_data(world_data, decorations, enemies, pickups)
     old_Inventory = [player.defence, player.hp, player.damage]
@@ -135,7 +137,22 @@ def startup():
         bosses.add(boss)
 
 
+def save_game():
+    with open('savefile.json', 'wb') as savefile:
+        savefile.write(str.encode(str({'level': level, 'inventory': old_Inventory})))
+
+def open_save():
+    global level, old_Inventory
+    if os.path.exists('savefile.json'):
+        with open('savefile.json', 'rb') as savefile:
+            data = literal_eval(savefile.read().decode())
+            level = data['level']
+            old_Inventory = data['inventory']
+
+
 if __name__ == '__main__':
+    # save_game()
+    open_save()
     jumper = 0
     global kicks, players, decoration_group, enemies, decoration_mobs, abilities_group, all_sprites, \
         sprite, image, decorations, pickups, world_data, world, player, camera, ui, cur_cutscene, boss
@@ -177,6 +194,7 @@ if __name__ == '__main__':
             level += 1
             startup()
             newLevel = False
+            save_game()
 
         if not pause:
             a = 0
@@ -206,7 +224,7 @@ if __name__ == '__main__':
                 for bossK in bosses:  # без группы и следования по спрайтам в ней нельзя удалить спрайт, спасибо пайгейм
                     bossK.draw(display)
                     bossK.update(scroll)
-                    bossK.move(player, scroll_data)
+                    bossK.move(player, scroll_data, enemies)
 
                     if pygame.sprite.spritecollide(bossK, players, False):
                         if bossK.contact == 5:

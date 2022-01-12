@@ -5,6 +5,7 @@ from Enemies.slime import Slime
 from Enemies.rage_slime import RageSlime
 from Enemies.eyes import Eye
 from Enemies.boss import Boss
+from Enemies.eyes import *
 from Utilities.constants import *
 
 from Pickups.armor import Armor
@@ -57,12 +58,13 @@ class World:
                     elif tile == 800:
                         slime = Slime(x * 38, y * 38, 2)
                         enemies.add(slime)
-                    elif tile == 801:
-                        rage_slime = RageSlime(x * 38 + 10, y * 38, 2)
-                        enemies.add(rage_slime)
+
                     elif tile == 802:
                         boss = Boss(x * 38 + 10, y * 38, 2)
                         # enemies.add(boss)
+                    elif tile == 803:
+                        eye = Eye(x * 38 + 10, y * 38, 2)
+                        enemies.add(eye)
         return player, boss
 
     def draw(self, display, scroll_data):

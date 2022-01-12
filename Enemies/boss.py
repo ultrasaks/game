@@ -7,6 +7,8 @@ from pygame.locals import *
 from Utilities.constants import *
 from Utilities.load_image import load_image
 import random
+from Enemies.slime import Slime
+from Enemies.rage_slime import RageSlime
 
 
 
@@ -36,14 +38,10 @@ class Boss(pygame.sprite.Sprite):
         self.contact = 0
         self.step = 0
 
-    def move(self, player, world, tolchok=0):
+    def move(self, player, world, enemies):
         dx = 0
         dy = 0
         if self.NN >= 15:
-            # if tolchok == 1:
-            #     dx += 150
-            # elif tolchok == 2:
-            #     dx -= 150
 
             if player.rect.x < self.rect.center[0]:
                 if self.in_air:
@@ -81,8 +79,6 @@ class Boss(pygame.sprite.Sprite):
             if tile[1].colliderect(self.rect.x + dx, self.rect.y, self.width, self.height):
                 dx = 0
 
-
-
             # check for collision in the y direction
             if tile[1].colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
                 # check if below the ground, i.e. jumping
@@ -94,6 +90,7 @@ class Boss(pygame.sprite.Sprite):
                     self.vel_y = 0
                     self.in_air = False
                     dy = tile[1].top - self.rect.bottom
+
         if self.NN >= 15:
             self.step += 1
             if self.step <= -7:
@@ -117,6 +114,14 @@ class Boss(pygame.sprite.Sprite):
 
         self.rect.x += dx
         self.rect.y += dy
+
+        chance = random.randint(1, 2000)
+        if chance <= 3:
+            enemy = Slime(self.rect.x, self.rect.y, hp=50)
+            enemies.add(enemy)
+        elif chance == 4:
+            enemy = RageSlime(self.rect.x, self.rect.y, hp=70)
+            enemies.add(enemy)
 
     def kick(self, player):
         self.NN = 0

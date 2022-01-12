@@ -24,7 +24,7 @@ class Slime(pygame.sprite.Sprite):
     img_slime_what = pygame.transform.scale(
         load_image("enemy/slime/what.png"), (30, 30))
 
-    def __init__(self, x, y, speed=5, *group):
+    def __init__(self, x, y, speed=5, hp=100, *group):
         super().__init__(*group)
         self.speed = speed
         self.vel_y = 0
@@ -35,7 +35,7 @@ class Slime(pygame.sprite.Sprite):
         self.in_air = False
         self.flip = False
         self.alive = True
-        self.hp = 100
+        self.hp = hp
         self.flips = False
         self.damage = 15
 

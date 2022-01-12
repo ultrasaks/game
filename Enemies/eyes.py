@@ -16,7 +16,7 @@ import random
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, x, y, player, scroll, speed=5,  *group):
         super().__init__(*group)
-        self.speed = speed
+        # self.speed = speed
         self.vel_y = 0
         self.image = pygame.transform.scale(
             load_image("enemy/bullet/bullet.png"), (10, 10))
@@ -37,8 +37,8 @@ class Bullet(pygame.sprite.Sprite):
         self.target_y = player.rect.center[1]
         self.angle = math.atan2(
             (self.rect.y - scroll[1]) - self.target_y, (self.rect.x - scroll[0]) - self.target_x)
-        self.x_vel = math.cos(self.angle) * 10
-        self.y_vel = math.sin(self.angle) * 10
+        self.x_vel = math.cos(self.angle) * 5
+        self.y_vel = math.sin(self.angle) * 5
 
         self.NN = 0
 
@@ -61,7 +61,6 @@ class Bullet(pygame.sprite.Sprite):
 
 
 class Eye(pygame.sprite.Sprite):
-
     def __init__(self, x, y, speed=0, *group):
         super().__init__(*group)
         self.speed = speed
