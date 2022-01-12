@@ -3,6 +3,7 @@ import pygame
 from player import Player
 from Enemies.slime import Slime
 from Enemies.rage_slime import RageSlime
+from Enemies.eyes import Eye
 from Enemies.boss import Boss
 from Utilities.constants import *
 

@@ -16,13 +16,13 @@ class Rune(pygame.sprite.Sprite):
             self.type_rune = "jump"
             self.image = pygame.transform.scale(load_image(
                 "item/rune_jump.png"), (30, 30)).convert_alpha()
-        else:  # ToDo: ЧТО ТЫ БЛЯТЬ СДЕЛАЛ ОНО ЖЕ ВСЁ ЛОМАЕТСЯ НА G
+        else:
             self.type_rune = "jump"
             self.image = pygame.transform.scale(load_image(
                 "item/rune_jump.png"), (30, 30)).convert_alpha()
         self.rect = self.image.get_rect()
         self.rect.x = x
-        self.rect.y = y
+        self.rect.y = y - 40
         self.width = self.image.get_width()
         self.height = self.image.get_height()
         self.speed = speed
@@ -67,14 +67,14 @@ class Rune(pygame.sprite.Sprite):
 
     def proverka(self, player, display, ui):
         if player.rect.x >= self.rect.x + 50 or player.rect.x <= self.rect.x - 50:
-            ui.image = pygame.transform.scale(
+            ui.image4 = pygame.transform.scale(
                 load_image("UI/e_1.png"), (10, 10)).convert_alpha()
             ui.draw_e(self.rect, display, (255, 255, 255))
             player.rune_true = False
-            if player.rect.x >= self.rect.x + 300 or player.rect.x <= self.rect.x - 300 and player.rect.y >= self.rect.y + 200 or player.rect.y <= self.rect.y - 200:
+            if player.rect.x >= self.rect.x + 700 or player.rect.x <= self.rect.x - 700 and player.rect.y >= self.rect.y + 300 or player.rect.y <= self.rect.y - 300:
                 self.kill()
         else:
-            ui.image = pygame.transform.scale(
+            ui.image4 = pygame.transform.scale(
                 load_image("UI/e_2.png"), (10, 10)).convert_alpha()
             ui.draw_e(self.rect, display, (220, 220, 220))
             player.rune_true = True

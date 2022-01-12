@@ -53,10 +53,10 @@ class UI:
         sprite = pygame.sprite.Sprite()
         if player.rune_type == "speed":
             sprite.image = pygame.transform.scale(load_image(
-                "item/rune_speed.png"), (50, 50)).convert_alpha()
+                "item/rune_speed.png"), (40, 40)).convert_alpha()
         if player.rune_type == "jump":
             sprite.image = pygame.transform.scale(load_image(
-                "item/rune_jump.png"), (50, 50)).convert_alpha()
+                "item/rune_jump.png"), (40, 40)).convert_alpha()
         sprite.rect = sprite.image.get_rect()
         sprite.rect.center = self.rect3.center
         group = pygame.sprite.Group()

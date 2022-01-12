@@ -28,6 +28,7 @@ class Player(pygame.sprite.Sprite):
         self.doubleJ = False
 
         self.defence = 1  # потом
+        self.defence_dop = 1
         self.damage = [15, 30]
         self.mana = True
         self.mana_count = 7
@@ -142,7 +143,7 @@ class Player(pygame.sprite.Sprite):
 
     def kick(self, enemy):
         if self.delay == 0:
-            self.hp -= enemy.damage * self.defence
+            self.hp -= enemy.damage * self.defence * self.defence_dop
             self.delay = 50
         if self.hp <= 0:
             self.alive = False

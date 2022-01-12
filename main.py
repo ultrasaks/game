@@ -14,6 +14,7 @@ from items.item import Item
 from Utilities.camera import Camera
 from Utilities.constants import *
 from items.runes import *
+from Enemies.eyes import *
 from bird import Bird
 
 from ability import Ability
@@ -29,12 +30,17 @@ scroll_data = []
 scroll = [0, 0]
 true_scroll = [0, 0]
 
+
+
 old_Inventory = None
 
-level = 6
+level = 1
 cutscenes = {0: [[410, 'Игрок бегает на кнопки [A]|[D] и [←]|[→]'], [300, 'Прыжок совершается на [W] или [↑]']],
              1: [[300, 'У тебя в руке меч, это значит что ты можешь бить им на [SPACE] или [↓]']]}
+
 isCutscene = False
+
+
 
 
 img_list = []
@@ -144,6 +150,7 @@ if __name__ == '__main__':
     clock = pygame.time.Clock()
     screen = pygame.display.set_mode(SCREEN_SIZE, 0, 32)
     display = pygame.Surface(DISPLAY_SIZE, 0, 32)
+    bullet_group = pygame.sprite.Group()
 
     kick_sound = pygame.mixer.Sound("sounds/kick.wav")
     jump_sound = pygame.mixer.Sound("sounds/jump.wav")
@@ -232,8 +239,13 @@ if __name__ == '__main__':
             if not isCutscene:
                 for enemy in enemies:
                     enemy.draw_hp(display)
+                    for i in abilities_group:
+                        i.kick(enemy, runes, poisons, i, False)
                     if pygame.sprite.spritecollide(enemy, kicks, False):
-                        enemy.kick(player, runes, poisons)
+                        enemy.kick(player, runes, poisons, True)
+                        if enemy.type_enemy == "eye" and enemy.alive is False and random.randint(0, 10) == 2:
+                            enemies.add(BadEye(enemy.rect.x, enemy.rect.y, player))
+
 
                     if pygame.sprite.spritecollide(enemy, players, False):
                         if enemy.contact == 5:
@@ -247,7 +259,22 @@ if __name__ == '__main__':
                     else:
                         enemy.contact = 0
                     enemy.update(scroll)
-                    enemy.move(player, scroll_data)
+                    if enemy.type_enemy == "eye":
+                        bullet_group = enemy.move(player, scroll_data)
+                    else:
+                        enemy.move(player, scroll_data)
+
+                    bullet_group.draw(display)
+                    for i in bullet_group:
+                        if pygame.sprite.spritecollide(i, players, False):
+                            player.kick(i)
+                            i.kill()
+                        i.update(scroll)
+                        i.move(player, scroll_data)
+
+
+
+
 
                 if player.alive:
                     player.move(moving_left, moving_right, scroll_data)
@@ -288,7 +315,7 @@ if __name__ == '__main__':
             for i in abilities_group:
                 i.update(scroll)
                 i.move(player, scroll)
-                i.clocker()
+                i.clocker(player)
 
             true_scroll[0] = (player.rect.center[0] -
                               true_scroll[0] - A_scroll) // 15
@@ -353,7 +380,7 @@ if __name__ == '__main__':
                         player.rune = True
                         player.rune_type = i.type_rune
                         i.kill()
-                if event.key in [K_g]:
+                if event.key in [K_g] and player.rune is True:
                     ff = 0
                     if player.flip is False:
                         ff = 10
