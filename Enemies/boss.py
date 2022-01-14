@@ -16,6 +16,10 @@ class Boss(pygame.sprite.Sprite):
     img_base = load_image("boss/base.png")
     img_step1 = load_image('boss/step1.png')
     img_step2 = load_image('boss/step2.png')
+    img_fall = load_image('boss/fall.png')
+    img_jump = load_image('boss/jump.png')
+    img_shock = load_image('boss/shock.png')
+    img_kick = load_image('boss/kick.png')
 
     def __init__(self, x, y, speed=20, *group):
         super().__init__(*group)
@@ -37,6 +41,7 @@ class Boss(pygame.sprite.Sprite):
         self.player_flip = True
         self.contact = 0
         self.step = 0
+        self.kick_wait = 0
 
     def move(self, player, world, enemies):
         dx = 0
@@ -103,19 +108,20 @@ class Boss(pygame.sprite.Sprite):
                 self.image = self.img_step1
             else:
                 self.step = -14
-
-            # if dy > GRAVITY_SLIME:
-            #     self.image = self.img_base
-            # elif dy < 0:
-            #     # self.image = self.img_slime_jump
+            if dy < -GRAVITY_SLIME:
+                self.image = self.img_jump
+            elif dy > GRAVITY_SLIME:
+                self.image = self.img_fall
+            if self.kick_wait > 0:
+                self.image = self.img_kick
+                self.kick_wait -= 1
         else:
-            # self.image = self.img_slime_what
-            pass
+            self.image = self.img_shock
 
         self.rect.x += dx
         self.rect.y += dy
 
-        chance = random.randint(1, 2000)
+        chance = random.randint(1, 5000)
         if chance <= 3:
             enemy = Slime(self.rect.x, self.rect.y, hp=50)
             enemies.add(enemy)
@@ -127,7 +133,6 @@ class Boss(pygame.sprite.Sprite):
         self.NN = 0
         self.hp -= random.randint(player.damage[0], player.damage[1])
         self.player_flip = player.flip
-        print(f'кот получил урон|{self.hp}')
         if self.hp <= 0:
             player.mana_count += 3
             self.kill()

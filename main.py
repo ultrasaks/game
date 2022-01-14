@@ -34,7 +34,7 @@ true_scroll = [0, 0]
 
 old_Inventory = None
 
-level = 3
+level = 6
 cutscenes = {0: [[410, 'Игрок бегает на кнопки [A]|[D] и [←]|[→]'], [300, 'Прыжок совершается на [W] или [↑]']],
              1: [[300, 'У тебя в руке меч, это значит что ты можешь бить им на [SPACE] или [↓]']]}
 
@@ -55,7 +55,10 @@ for x in range(500, 505):
 
 
 def draw_bg():
+    # display.fill((130, 130, 130))
     display.fill((105, 193, 231))
+    background_group.draw(display)
+
 
 
 def kick():
@@ -82,6 +85,8 @@ def startup():
     decoration_mobs = pygame.sprite.Group()
     abilities_group = pygame.sprite.Group()
     bosses = pygame.sprite.Group()
+
+
 
     all_sprites = pygame.sprite.Group()
     sprite = pygame.sprite.Sprite()
@@ -167,6 +172,13 @@ if __name__ == '__main__':
     screen = pygame.display.set_mode(SCREEN_SIZE, 0, 32)
     display = pygame.Surface(DISPLAY_SIZE, 0, 32)
     bullet_group = pygame.sprite.Group()
+    background_group = pygame.sprite.Group()
+
+    background = pygame.sprite.Sprite()
+    background.image = load_image('background/test.png')
+    background.rect = background.image.get_rect()
+    background.rect.x = background.rect.x - 500
+    background_group.add(background)
 
     kick_sound = pygame.mixer.Sound("sounds/kick.wav")
     jump_sound = pygame.mixer.Sound("sounds/jump.wav")
@@ -227,11 +239,12 @@ if __name__ == '__main__':
                     bossK.move(player, scroll_data, enemies)
 
                     if pygame.sprite.spritecollide(bossK, players, False):
-                        if bossK.contact == 5:
+                        if bossK.contact == 7:
                             if not a:
                                 color_hp = (21, 143, 26)
                                 player.kick(bossK)
                                 bossK.contact = 0
+                                bossK.kick_wait = 15
                             else:
                                 color_hp = (20, 30, 255)
                         bossK.contact += 1
@@ -262,7 +275,6 @@ if __name__ == '__main__':
                         enemy.kick(player, runes, poisons, True)
                         if enemy.type_enemy == "eye" and enemy.alive is False and random.randint(0, 10) == 2:
                             enemies.add(BadEye(enemy.rect.x, enemy.rect.y, player))
-
 
                     if pygame.sprite.spritecollide(enemy, players, False):
                         if enemy.contact == 5:
