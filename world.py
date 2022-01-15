@@ -3,14 +3,16 @@ import pygame
 from player import Player
 from Enemies.slime import Slime
 from Enemies.rage_slime import RageSlime
+from Enemies.eyes import Eye
 from Enemies.boss import Boss
+from Enemies.eyes import *
 from Utilities.constants import *
 
-from Pickups.armor import Armor
-from Pickups.exit import Exit
-from Pickups.cutscene import Cutscene
-from Pickups.death import Death
-from Pickups.bebra import Bebra
+from pickups.armor import Armor
+from pickups.exit import Exit
+from pickups.cutscene import Cutscene
+from pickups.death import Death
+from pickups.bebra import Bebra
 
 
 class World:
@@ -24,7 +26,7 @@ class World:
         for y, row in enumerate(data):
             for x, tile in enumerate(row):
                 if tile >= 0:
-                    if tile < 500:
+                    if tile < 700:
                         if 500 <= tile < 700:
                             img = self.decor_list[tile - 500]
                         else:
@@ -33,7 +35,6 @@ class World:
                         img_rect.x = x * TILE_SIZE
                         img_rect.y = y * TILE_SIZE
                         tile_data = (img, img_rect)
-
                     if 0 <= tile < 500 and tile != 15:
                         self.obstacle_list.append(tile_data)
                     elif 500 <= tile < 700:
@@ -57,12 +58,13 @@ class World:
                     elif tile == 800:
                         slime = Slime(x * 38, y * 38, 2)
                         enemies.add(slime)
-                    elif tile == 801:
-                        rage_slime = RageSlime(x * 38 + 10, y * 38, 2)
-                        enemies.add(rage_slime)
+
                     elif tile == 802:
                         boss = Boss(x * 38 + 10, y * 38, 2)
                         # enemies.add(boss)
+                    elif tile == 803:
+                        eye = Eye(x * 38 + 10, y * 38, 2)
+                        enemies.add(eye)
         return player, boss
 
     def draw(self, display, scroll_data):

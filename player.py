@@ -16,6 +16,7 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, x, y, speed=5, inventory=None, *group):
         super().__init__(*group)
         self.speed = speed
+        self.speed_2 = speed
         self.vel_y = 0
         self.image = self.baseSprite
         self.rect = self.image.get_rect()
@@ -27,9 +28,16 @@ class Player(pygame.sprite.Sprite):
         self.doubleJ = False
 
         self.defence = 1  # потом
+        self.defence_dop = 1
         self.damage = [15, 30]
         self.mana = True
-        self.mana_count = 0
+        self.mana_count = 7
+        self.mana_respawn = 0
+        self.rune_true = False
+        self.rune = False
+        self.rune_type = ""
+        self.regen = False
+        self.regen_count = 0
 
         self.hp = 100  # потом
         self.width = self.image.get_width()
@@ -38,6 +46,8 @@ class Player(pygame.sprite.Sprite):
         self.spriteRun = False
         self.isKick = 0
         self.delay = 0
+
+        self.marvin = False
 
         if inventory is None:
             self.inventory = [0, 100, [15, 30]]
@@ -49,8 +59,12 @@ class Player(pygame.sprite.Sprite):
 
     def move(self, moving_left, moving_right, world):
         # движение за этот ход
+        sprite_cadr = 6
         dx = 0
         dy = 0
+        if self.rune_type == "speed":
+            self.speed = 10
+            sprite_cadr = 3
         if self.delay > 0:
             self.delay -= 1
 
@@ -69,7 +83,7 @@ class Player(pygame.sprite.Sprite):
 
         if moving_left or moving_right:  # спрайты во время бега
             self.spriteN += 1
-            if self.spriteN >= 6:  # за сколько кадров сменяется спрайт
+            if self.spriteN >= sprite_cadr:  # за сколько кадров сменяется спрайт
                 self.spriteN = 0
                 if self.spriteRun:
                     self.spriteRun = False
@@ -101,7 +115,7 @@ class Player(pygame.sprite.Sprite):
             if tile[1].colliderect(self.rect.x + dx, self.rect.y, self.width, self.height):
                 dx = 0
             # check for collision in the y direction
-            if tile[1].colliderect(self.rect.x , self.rect.y + dy, self.width, self.height):
+            if tile[1].colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
                 # check if below the ground, i.e. jumping
                 if self.vel_y < 0:
                     self.vel_y = 0
@@ -131,21 +145,33 @@ class Player(pygame.sprite.Sprite):
 
     def kick(self, enemy):
         if self.delay == 0:
-            self.hp -= enemy.damage * self.defence
+            self.hp -= enemy.damage * self.defence * self.defence_dop
             self.delay = 50
         if self.hp <= 0:
             self.alive = False
         # print("Герой крыс получил урон")
 
     def draw(self, display):
-        if self.mana_count >= 10:
-            self.mana = True
-            self.mana_count = 0
         display.blit(pygame.transform.flip(self.image, self.flip, False), self.rect)
 
     def update(self, scroll):
         self.rect.x -= scroll[0]
         self.rect.y -= scroll[1]
+        self.mana_respawn += 1
+        if self.mana_respawn >= 500:
+            if self.mana_count < 7:
+                self.mana_count += 1
+            self.mana_respawn = 0
+        if self.regen:
+            self.regen_count += 1
+            if self.regen_count % 60 == 0:
+                if self.hp >= 95:
+                    self.hp = 100
+                else:
+                    self.hp += 5
+                if self.regen_count >= 360:
+                    self.regen = False
+                    self.regen_count = 0
 
     def equip_armor(self):
         self.baseSprite = load_image("player/armor_base.png")
