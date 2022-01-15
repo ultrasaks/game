@@ -29,6 +29,12 @@ newLevel = False
 scroll_data = []
 scroll = [0, 0]
 true_scroll = [0, 0]
+mountains_back_img = pygame.transform.scale(load_image("background/back_mount.png"), (A_scroll * 3, B_scroll * 3))
+mountains_img = pygame.transform.scale(load_image("background/mount.png"), (A_scroll * 3, B_scroll * 3))
+mountains_back = [[0 - mountains_back_img.get_width(), 0], [0, 0], [mountains_back_img.get_width(), 0]]
+mountains = [[0 - mountains_back_img.get_width(), 0], [0, 0], [mountains_back_img.get_width(), 0]]
+background_1 = pygame.transform.scale(load_image("background/sky.png"), DISPLAY_SIZE)
+mountains_paralacks = [0.2, 0.3]
 
 marvin_count = 0
 
@@ -59,7 +65,28 @@ for x in range(500, 505):
 
 
 def draw_bg():
-    display.fill((105, 193, 231))
+    global level, mountains_back_img, mountains, mountains_back, mountains_img, background_1, mountains_paralacks
+    if level <= 5:
+        for i in mountains_back:
+            i[0] -= scroll[0] * mountains_paralacks[0]
+
+
+        for i in mountains:
+            i[0] -= scroll[0] * mountains_paralacks[1]
+
+
+        display.fill((0, 191, 255))
+        for i in mountains_back:
+            display.blit(mountains_back_img, (i[0], i[1]))
+        for i in mountains:
+            display.blit(mountains_img, (i[0], i[1]))
+    else:
+        display.fill((0, 191, 255))
+
+
+
+
+
 
 
 def kick():
@@ -78,7 +105,7 @@ def kick():
 def startup():
     global kicks, players, decoration_group, enemies, decoration_mobs, abilities_group, all_sprites, \
         sprite, image, decorations, pickups, world_data, world, player, camera, ui, old_Inventory, cur_cutscene, \
-        boss, bosses
+        boss, bosses, mountains_back_img, mountains, mountains_back, mountains_img, background_1, mountains_paralacks
     kicks = pygame.sprite.Group()
     boss = None
     decoration_group = pygame.sprite.Group()
@@ -97,6 +124,12 @@ def startup():
 
     decorations = Decor()
     pickups = Pickup()
+    mountains_back_img = pygame.transform.scale(load_image("background/back_mount.png"), (A_scroll * 3, B_scroll * 3))
+    mountains_img = pygame.transform.scale(load_image("background/mount.png"), (A_scroll * 3, B_scroll * 3))
+    mountains_back = [[0 - mountains_back_img.get_width(), 0], [0, 0], [mountains_back_img.get_width(), 0]]
+    mountains = [[0 - mountains_back_img.get_width(), 0], [0, 0], [mountains_back_img.get_width(), 0]]
+    background_1 = pygame.transform.scale(load_image("background/sky.png"), DISPLAY_SIZE)
+    mountains_paralacks = [0.2, 0.3]
 
     world_data = []
     with open(f'levels/level{level}_data.csv', newline='') as csvfile:

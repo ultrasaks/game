@@ -7,11 +7,11 @@ from Enemies.eyes import Eye
 from Enemies.boss import Boss
 from Utilities.constants import *
 
-from Pickups.armor import Armor
-from Pickups.exit import Exit
-from Pickups.cutscene import Cutscene
-from Pickups.death import Death
-from Pickups.bebra import Bebra
+from pickups.armor import Armor
+from pickups.exit import Exit
+from pickups.cutscene import Cutscene
+from pickups.death import Death
+from pickups.bebra import Bebra
 
 
 class World:
