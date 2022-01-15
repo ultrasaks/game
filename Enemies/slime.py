@@ -26,6 +26,7 @@ class Slime(pygame.sprite.Sprite):
 
     def __init__(self, x, y, speed=5, hp=100, *group):
         super().__init__(*group)
+        self.dead_sound = pygame.mixer.Sound("sounds/dead_enemy.wav")
         self.speed = speed
         self.vel_y = 0
         self.image = Slime.img_slime_down
@@ -118,6 +119,7 @@ class Slime(pygame.sprite.Sprite):
         self.player_flip = player.flip
         print(f'Слайм получил урон|{self.hp}')
         if self.hp <= 0:
+            self.dead_sound.play()
             if f:
                 if player.mana_count < 7:
                     player.mana_count += 1
@@ -128,9 +130,9 @@ class Slime(pygame.sprite.Sprite):
                 rune = Rune(self.rect.x, self.rect.y, 0,
                             random.choice(["speed", "jump"]))
                 groups.add(rune)
-            elif b in [28, 2, 7]:
+            elif b in [28, 2, 7, 6, 9]:
                 poison = Poison(self.rect.x, self.rect.y + 8, 0,
-                                random.choice(["heal", "mana", "heal", "regen", "mana", "heal", "mana", "heal", "regen", "mana", "super", "super"]))
+                                random.choice(["heal", "mana", "heal", "regen", "mana", "heal", "mana", "heal", "regen", "mana", "super", "super", "secret"]))
                 groups2.add(poison)
 
 

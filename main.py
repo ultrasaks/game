@@ -30,6 +30,14 @@ newLevel = False
 scroll_data = []
 scroll = [0, 0]
 true_scroll = [0, 0]
+mountains_back_img = pygame.transform.scale(load_image("background/back_mount.png"), (A_scroll * 3, B_scroll * 3))
+mountains_img = pygame.transform.scale(load_image("background/mount.png"), (A_scroll * 3, B_scroll * 3))
+mountains_back = [[0 - mountains_back_img.get_width(), 0], [0, 0], [mountains_back_img.get_width(), 0]]
+mountains = [[0 - mountains_back_img.get_width(), 0], [0, 0], [mountains_back_img.get_width(), 0]]
+background_1 = pygame.transform.scale(load_image("background/sky.png"), DISPLAY_SIZE)
+mountains_paralacks = [0.2, 0.3]
+
+marvin_count = 0
 
 
 old_Inventory = None
@@ -55,9 +63,28 @@ for x in range(500, 505):
 
 
 def draw_bg():
-    # display.fill((130, 130, 130))
-    display.fill((105, 193, 231))
-    background_group.draw(display)
+    global level, mountains_back_img, mountains, mountains_back, mountains_img, background_1, mountains_paralacks
+    if level <= 5:
+        for i in mountains_back:
+            i[0] -= scroll[0] * mountains_paralacks[0]
+
+
+        for i in mountains:
+            i[0] -= scroll[0] * mountains_paralacks[1]
+
+
+        display.fill((0, 191, 255))
+        for i in mountains_back:
+            display.blit(mountains_back_img, (i[0], i[1]))
+        for i in mountains:
+            display.blit(mountains_img, (i[0], i[1]))
+    else:
+        display.fill((0, 191, 255))
+
+
+    # display.fill((105, 193, 231))
+    # background_group.draw(display)
+
 
 
 
@@ -77,7 +104,7 @@ def kick():
 def startup():
     global kicks, players, decoration_group, enemies, decoration_mobs, abilities_group, all_sprites, \
         sprite, image, decorations, pickups, world_data, world, player, camera, ui, old_Inventory, cur_cutscene, \
-        boss, bosses
+        boss, bosses, mountains_back_img, mountains, mountains_back, mountains_img, background_1, mountains_paralacks
     kicks = pygame.sprite.Group()
     boss = None
     decoration_group = pygame.sprite.Group()
@@ -98,6 +125,12 @@ def startup():
 
     decorations = Decor()
     pickups = Pickup()
+    mountains_back_img = pygame.transform.scale(load_image("background/back_mount.png"), (A_scroll * 3, B_scroll * 3))
+    mountains_img = pygame.transform.scale(load_image("background/mount.png"), (A_scroll * 3, B_scroll * 3))
+    mountains_back = [[0 - mountains_back_img.get_width(), 0], [0, 0], [mountains_back_img.get_width(), 0]]
+    mountains = [[0 - mountains_back_img.get_width(), 0], [0, 0], [mountains_back_img.get_width(), 0]]
+    background_1 = pygame.transform.scale(load_image("background/sky.png"), DISPLAY_SIZE)
+    mountains_paralacks = [0.2, 0.3]
 
     world_data = []
     with open(f'levels/level{level}_data.csv', newline='') as csvfile:
@@ -183,7 +216,8 @@ if __name__ == '__main__':
     kick_sound = pygame.mixer.Sound("sounds/kick.wav")
     jump_sound = pygame.mixer.Sound("sounds/jump.wav")
     jump2_sound = pygame.mixer.Sound("sounds/djump.wav")
-    pygame.mixer.music.load("sounds/music.mp3")
+    pygame.mixer.music.load("sounds/music.wav")
+    bullet_kick = pygame.mixer.Sound("sounds/bullet_kick.wav")
     pygame.mixer.music.play(loops=-1, start=0.0, fade_ms=0)
     vol = 0.2
     pygame.mixer.music.set_volume(vol)
@@ -273,7 +307,7 @@ if __name__ == '__main__':
                         i.kick(enemy, runes, poisons, i, False)
                     if pygame.sprite.spritecollide(enemy, kicks, False):
                         enemy.kick(player, runes, poisons, True)
-                        if enemy.type_enemy == "eye" and enemy.alive is False and random.randint(0, 10) == 2:
+                        if enemy.type_enemy == "eye" and enemy.alive is False and random.randint(0, 10) == 10:
                             enemies.add(BadEye(enemy.rect.x, enemy.rect.y, player))
 
                     if pygame.sprite.spritecollide(enemy, players, False):
@@ -297,9 +331,19 @@ if __name__ == '__main__':
                     for i in bullet_group:
                         if pygame.sprite.spritecollide(i, players, False):
                             player.kick(i)
+                            bullet_kick.play()
                             i.kill()
+                        if pygame.sprite.spritecollide(i, kicks, False):
+                            i.kick()
                         i.update(scroll)
                         i.move(player, scroll_data)
+
+                if player.marvin:
+                    ui.draw_marvin(display)
+                    marvin_count += 1
+                    if marvin_count >= 90:
+                        player.marvin = False
+                        marvin_count = 0
 
                 if player.alive:
                     player.move(moving_left, moving_right, scroll_data)

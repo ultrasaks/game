@@ -47,6 +47,8 @@ class Player(pygame.sprite.Sprite):
         self.isKick = 0
         self.delay = 0
 
+        self.marvin = False
+
         if inventory is None:
             self.inventory = [0, 100, [15, 30]]
         else:

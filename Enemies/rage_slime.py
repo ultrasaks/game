@@ -26,6 +26,7 @@ class RageSlime(pygame.sprite.Sprite):
 
     def __init__(self, x, y, speed=5, hp=150, *group):
         super().__init__(*group)
+        self.dead_sound = pygame.mixer.Sound("sounds/dead_enemy.wav")
         self.speed = speed
         self.vel_y = 0
         self.image = RageSlime.img_slime_down
@@ -113,6 +114,7 @@ class RageSlime(pygame.sprite.Sprite):
         self.player_flip = player.flip
         print(f'Слайм получил урон|{self.hp}')
         if self.hp <= 0:
+            self.dead_sound.play()
             if f:
                 if player.mana_count < 7:
                     player.mana_count += 1
@@ -125,7 +127,7 @@ class RageSlime(pygame.sprite.Sprite):
                 groups.add(rune)
             elif b in [18, 2]:
                 poison = Poison(self.rect.x, self.rect.y + 18, 0, random.choice(
-                    ["heal", "mana", "heal", "regen", "mana", "heal", "mana", "heal", "regen", "mana", "super", "super"]))
+                    ["heal", "mana", "heal", "regen", "mana", "heal", "mana", "heal", "regen", "mana", "super", "super", "secret"]))
                 groups2.add(poison)
 
 
