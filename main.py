@@ -4,6 +4,7 @@ import sys
 import random
 import csv
 from UI import UI
+from ast import literal_eval
 
 from pygame.locals import *
 
@@ -39,16 +40,13 @@ mountains_paralacks = [0.2, 0.3]
 marvin_count = 0
 
 
-
 old_Inventory = None
 
-level = 1
+level = 6
 cutscenes = {0: [[410, 'Игрок бегает на кнопки [A]|[D] и [←]|[→]'], [300, 'Прыжок совершается на [W] или [↑]']],
              1: [[300, 'У тебя в руке меч, это значит что ты можешь бить им на [SPACE] или [↓]']]}
 
 isCutscene = False
-
-
 
 
 img_list = []
@@ -84,7 +82,8 @@ def draw_bg():
         display.fill((0, 191, 255))
 
 
-
+    # display.fill((105, 193, 231))
+    # background_group.draw(display)
 
 
 
@@ -113,6 +112,8 @@ def startup():
     decoration_mobs = pygame.sprite.Group()
     abilities_group = pygame.sprite.Group()
     bosses = pygame.sprite.Group()
+
+
 
     all_sprites = pygame.sprite.Group()
     sprite = pygame.sprite.Sprite()
@@ -155,6 +156,9 @@ def startup():
             old_Inventory = [player.defence, player.hp, player.damage]
         players.empty()
         player, boss = world.process_data(world_data, decorations, enemies, pickups, old_Inventory)
+    elif old_Inventory:
+        players.empty()
+        player, boss = world.process_data(world_data, decorations, enemies, pickups, old_Inventory)
     else:
         player, boss = world.process_data(world_data, decorations, enemies, pickups)
     old_Inventory = [player.defence, player.hp, player.damage]
@@ -171,7 +175,22 @@ def startup():
         bosses.add(boss)
 
 
+def save_game():
+    with open('savefile.json', 'wb') as savefile:
+        savefile.write(str.encode(str({'level': level, 'inventory': old_Inventory})))
+
+def open_save():
+    global level, old_Inventory
+    if os.path.exists('savefile.json'):
+        with open('savefile.json', 'rb') as savefile:
+            data = literal_eval(savefile.read().decode())
+            level = data['level']
+            old_Inventory = data['inventory']
+
+
 if __name__ == '__main__':
+    # save_game()
+    open_save()
     jumper = 0
     global kicks, players, decoration_group, enemies, decoration_mobs, abilities_group, all_sprites, \
         sprite, image, decorations, pickups, world_data, world, player, camera, ui, cur_cutscene, boss
@@ -186,6 +205,13 @@ if __name__ == '__main__':
     screen = pygame.display.set_mode(SCREEN_SIZE, 0, 32)
     display = pygame.Surface(DISPLAY_SIZE, 0, 32)
     bullet_group = pygame.sprite.Group()
+    background_group = pygame.sprite.Group()
+
+    background = pygame.sprite.Sprite()
+    background.image = load_image('background/test.png')
+    background.rect = background.image.get_rect()
+    background.rect.x = background.rect.x - 500
+    background_group.add(background)
 
     kick_sound = pygame.mixer.Sound("sounds/kick.wav")
     jump_sound = pygame.mixer.Sound("sounds/jump.wav")
@@ -214,6 +240,7 @@ if __name__ == '__main__':
             level += 1
             startup()
             newLevel = False
+            save_game()
 
         if not pause:
             a = 0
@@ -243,14 +270,15 @@ if __name__ == '__main__':
                 for bossK in bosses:  # без группы и следования по спрайтам в ней нельзя удалить спрайт, спасибо пайгейм
                     bossK.draw(display)
                     bossK.update(scroll)
-                    bossK.move(player, scroll_data)
+                    bossK.move(player, scroll_data, enemies)
 
                     if pygame.sprite.spritecollide(bossK, players, False):
-                        if bossK.contact == 5:
+                        if bossK.contact == 7:
                             if not a:
                                 color_hp = (21, 143, 26)
                                 player.kick(bossK)
                                 bossK.contact = 0
+                                bossK.kick_wait = 15
                             else:
                                 color_hp = (20, 30, 255)
                         bossK.contact += 1
@@ -282,8 +310,6 @@ if __name__ == '__main__':
                         if enemy.type_enemy == "eye" and enemy.alive is False and random.randint(0, 10) == 10:
                             enemies.add(BadEye(enemy.rect.x, enemy.rect.y, player))
 
-
-
                     if pygame.sprite.spritecollide(enemy, players, False):
                         if enemy.contact == 5:
                             if not a:
@@ -312,14 +338,12 @@ if __name__ == '__main__':
                         i.update(scroll)
                         i.move(player, scroll_data)
 
-
                 if player.marvin:
                     ui.draw_marvin(display)
                     marvin_count += 1
                     if marvin_count >= 90:
                         player.marvin = False
                         marvin_count = 0
-
 
                 if player.alive:
                     player.move(moving_left, moving_right, scroll_data)

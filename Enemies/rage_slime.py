@@ -24,7 +24,7 @@ class RageSlime(pygame.sprite.Sprite):
     img_slime_what = pygame.transform.scale(
         load_image("enemy/slime_rage/what.png"), (35, 35))
 
-    def __init__(self, x, y, speed=5, *group):
+    def __init__(self, x, y, speed=5, hp=150, *group):
         super().__init__(*group)
         self.dead_sound = pygame.mixer.Sound("sounds/dead_enemy.wav")
         self.speed = speed
@@ -36,7 +36,7 @@ class RageSlime(pygame.sprite.Sprite):
         self.in_air = False
         self.flip = False
         self.alive = True
-        self.hp = 150
+        self.hp = hp
         self.damage = 20
         self.width = self.image.get_width()
         self.height = self.image.get_height()
