@@ -35,7 +35,7 @@ mountains_img = pygame.transform.scale(load_image("background/mount.png"), (A_sc
 mountains_back = [[0 - mountains_back_img.get_width(), 0], [0, 0], [mountains_back_img.get_width(), 0]]
 mountains = [[0 - mountains_back_img.get_width(), 0], [0, 0], [mountains_back_img.get_width(), 0]]
 background_1 = pygame.transform.scale(load_image("background/sky.png"), DISPLAY_SIZE)
-mountains_paralacks = [0.2, 0.3]
+mountains_paralacks = (0.2, 0.3)
 
 marvin_count = 0
 
@@ -65,27 +65,19 @@ for x in range(500, 505):
 def draw_bg():
     global level, mountains_back_img, mountains, mountains_back, mountains_img, background_1, mountains_paralacks
     if level <= 5:
-        for i in mountains_back:
-            i[0] -= scroll[0] * mountains_paralacks[0]
+        mountains_back[0][0] -= scroll[0] * mountains_paralacks[0]
 
-
-        for i in mountains:
-            i[0] -= scroll[0] * mountains_paralacks[1]
-
+        mountains[0][0] -= scroll[0] * mountains_paralacks[1]
+        mountains[1][0] -= scroll[0] * mountains_paralacks[1]
+        mountains[2][0] -= scroll[0] * mountains_paralacks[1]
 
         display.fill((0, 191, 255))
-        for i in mountains_back:
-            display.blit(mountains_back_img, (i[0], i[1]))
+        display.blit(mountains_back_img, (mountains[0][0], mountains[0][1]))
+
         for i in mountains:
             display.blit(mountains_img, (i[0], i[1]))
     else:
         display.fill((0, 191, 255))
-
-
-    # display.fill((105, 193, 231))
-    # background_group.draw(display)
-
-
 
 
 def kick():
@@ -113,8 +105,6 @@ def startup():
     abilities_group = pygame.sprite.Group()
     bosses = pygame.sprite.Group()
 
-
-
     all_sprites = pygame.sprite.Group()
     sprite = pygame.sprite.Sprite()
     image = pygame.transform.scale(
@@ -125,12 +115,8 @@ def startup():
 
     decorations = Decor()
     pickups = Pickup()
-    mountains_back_img = pygame.transform.scale(load_image("background/back_mount.png"), (A_scroll * 3, B_scroll * 3))
-    mountains_img = pygame.transform.scale(load_image("background/mount.png"), (A_scroll * 3, B_scroll * 3))
     mountains_back = [[0 - mountains_back_img.get_width(), 0], [0, 0], [mountains_back_img.get_width(), 0]]
     mountains = [[0 - mountains_back_img.get_width(), 0], [0, 0], [mountains_back_img.get_width(), 0]]
-    background_1 = pygame.transform.scale(load_image("background/sky.png"), DISPLAY_SIZE)
-    mountains_paralacks = [0.2, 0.3]
 
     world_data = []
     with open(f'levels/level{level}_data.csv', newline='') as csvfile:
@@ -179,6 +165,7 @@ def save_game():
     with open('savefile.json', 'wb') as savefile:
         savefile.write(str.encode(str({'level': level, 'inventory': old_Inventory})))
 
+
 def open_save():
     global level, old_Inventory
     if os.path.exists('savefile.json'):
@@ -207,11 +194,11 @@ if __name__ == '__main__':
     bullet_group = pygame.sprite.Group()
     background_group = pygame.sprite.Group()
 
-    background = pygame.sprite.Sprite()
-    background.image = load_image('background/test.png')
-    background.rect = background.image.get_rect()
-    background.rect.x = background.rect.x - 500
-    background_group.add(background)
+    # background = pygame.sprite.Sprite()
+    # background.image = load_image('background/test.png')
+    # background.rect = background.image.get_rect()
+    # background.rect.x = background.rect.x - 500
+    # background_group.add(background)
 
     kick_sound = pygame.mixer.Sound("sounds/kick.wav")
     jump_sound = pygame.mixer.Sound("sounds/jump.wav")
