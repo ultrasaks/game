@@ -129,13 +129,15 @@ class Boss(pygame.sprite.Sprite):
             enemy = RageSlime(self.rect.x, self.rect.y, hp=70)
             enemies.add(enemy)
 
-    def kick(self, player):
+    def kick(self, player,groups2):
         self.NN = 0
         self.hp -= random.randint(player.damage[0], player.damage[1])
         self.player_flip = player.flip
         if self.hp <= 0:
             player.mana_count += 3
             self.kill()
+            poison = Poison(self.rect.x, self.rect.y + 18, 0, random.choice(["secret"]))
+            groups2.add(poison)
 
     def update(self, scroll):
         self.rect.x -= scroll[0]

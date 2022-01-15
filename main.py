@@ -35,14 +35,14 @@ mountains_img = pygame.transform.scale(load_image("background/mount.png"), (A_sc
 mountains_back = [[0 - mountains_back_img.get_width(), 0], [0, 0], [mountains_back_img.get_width(), 0]]
 mountains = [[0 - mountains_back_img.get_width(), 0], [0, 0], [mountains_back_img.get_width(), 0]]
 background_1 = pygame.transform.scale(load_image("background/sky.png"), DISPLAY_SIZE)
-mountains_paralacks = (0.2, 0.3)
+mountains_paralacks = (0.2, 0.15)
 
 marvin_count = 0
 
 
 old_Inventory = None
 
-level = 6
+level = 1
 cutscenes = {0: [[410, 'Игрок бегает на кнопки [A]|[D] и [←]|[→]'], [300, 'Прыжок совершается на [W] или [↑]']],
              1: [[300, 'У тебя в руке меч, это значит что ты можешь бить им на [SPACE] или [↓]']]}
 
@@ -151,7 +151,6 @@ def startup():
     for i in range(50):
         bird = Bird(random.randint(50, 2000), random.randint(-6000, 0))
         decoration_mobs.add(bird)
-
     players.add(player)
     camera = Camera()
     ui = UI()
@@ -163,7 +162,9 @@ def startup():
 
 def save_game():
     with open('savefile.json', 'wb') as savefile:
-        savefile.write(str.encode(str({'level': level, 'inventory': old_Inventory})))
+        savefile.write(str.encode(str({'level': level, 'inventory': old_Inventory,
+                                       'runes':[player.rune, player.rune_type, player.rune_true],
+                                       'mana':[player.mana, player.mana_count, player.mana_respawn]})))
 
 
 def open_save():
@@ -173,11 +174,15 @@ def open_save():
             data = literal_eval(savefile.read().decode())
             level = data['level']
             old_Inventory = data['inventory']
+            runes = data["runes"]
+            mana = data["mana"]
+            player.rune, player.rune_type, player.rune_true = runes
+            player.mana, player.mana_count, player.mana_respawn = mana
 
 
 if __name__ == '__main__':
     # save_game()
-    open_save()
+
     jumper = 0
     global kicks, players, decoration_group, enemies, decoration_mobs, abilities_group, all_sprites, \
         sprite, image, decorations, pickups, world_data, world, player, camera, ui, cur_cutscene, boss
@@ -220,7 +225,7 @@ if __name__ == '__main__':
     abilityy = Ability()
 
     color_hp = (21, 143, 26)
-
+    open_save()
     while running:
         # print(true_scroll)
         if newLevel:
