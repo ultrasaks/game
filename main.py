@@ -253,6 +253,8 @@ if __name__ == '__main__':
     # save_game()
     screen = pygame.display.set_mode(SCREEN_SIZE, 0, 32)
     display = pygame.Surface(DISPLAY_SIZE, 0, 32)
+    pygame.display.set_icon(load_image("UI/logo.png"))
+    pygame.display.set_caption("RatNCat")
     a = menu(display, screen)
     if a == "exit":
         sys.exit(0)
