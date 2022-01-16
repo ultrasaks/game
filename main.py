@@ -71,7 +71,7 @@ for x in range(500, 505):
 def draw_bg():
     global level, mountains_back_img, mountains, mountains_back, mountains_img, background_1, mountains_parralax, \
         dungeon_parralax, dungeon, dungeon_background
-    if level <= 8:
+    if level <= 7:
         display.fill((0, 191, 255))
         if not pause:
             mountains[0][0] -= scroll[0] * mountains_parralax[1]
@@ -83,8 +83,9 @@ def draw_bg():
         decoration_mobs.draw(display)
     else:
         display.blit(dungeon_background, (dungeon[0], dungeon[1]))
-        dungeon[0] -= scroll[0] * dungeon_parralax
-        dungeon[1] -= scroll[1] * dungeon_parralax
+        if not pause:
+            dungeon[0] -= scroll[0] * dungeon_parralax
+            dungeon[1] -= scroll[1] * dungeon_parralax
 
 
 def kick():
