@@ -41,7 +41,7 @@ dungeon_parralax = 0.6
 marvin_count = 0
 tomas_count = 0
 
-fps_show = -1
+fps_show = False
 rune, mana = ("", "")
 
 
@@ -65,6 +65,7 @@ for x in range(20):
 for x in range(500, 505):
     img = load_image(f'tiles/{x}.png')
     img = pygame.transform.scale(img, (TILE_SIZE, TILE_SIZE))
+
     decor_list.append(img)
 
 
@@ -190,10 +191,73 @@ def open_save():
             old_Inventory = data['inventory']
             Rrune = data["runes"]
             Rmana = data["mana"]
+def menu(display, screen):
+    pygame.mouse.set_visible(False)
+    all_sprites = pygame.sprite.Group()
+    sprite = pygame.sprite.Sprite()
+    image = pygame.transform.scale(
+        load_image("enemy/slime/jump.png"), (15, 15))
+    sprite.image = image
+    sprite.rect = image.get_rect()
+    all_sprites.add(sprite)
+    value = ""
+    running = True
+    back = pygame.transform.scale(load_image("UI/menu_back.png"), DISPLAY_SIZE)
+    play1 = pygame.transform.scale(load_image("UI/play1.png"), (100, 100))
+    play2 = pygame.transform.scale(load_image("UI/play2.png"), (100, 100))
+    play_rect = play1.get_rect()
+    play_rect.center = (back.get_width() // 2, back.get_height() // 2)
+    exit1 = pygame.transform.scale(load_image("UI/exit1.png"), (100, 100))
+    exit2 = pygame.transform.scale(load_image("UI/exit2.png"), (100, 100))
+    exit_rect = exit1.get_rect()
+    exit_rect.x = 10
+    exit_rect.y = back.get_height() - 104
+
+    while running:
+        display.blit(back, (0, 0))
+        if play_rect.collidepoint(pygame.mouse.get_pos()):
+            display.blit(play2, (play_rect.x, play_rect.y))
+            for i in pygame.event.get():
+                if i.type == MOUSEBUTTONDOWN:
+                    running = False
+                    return "play"
+        else:
+            display.blit(play1, (play_rect.x, play_rect.y))
+
+        if exit_rect.collidepoint(pygame.mouse.get_pos()):
+            display.blit(exit2, (exit_rect.x, exit_rect.y))
+            for i in pygame.event.get():
+                if i.type == MOUSEBUTTONDOWN:
+                    running = False
+                    return "exit"
+        else:
+            display.blit(exit1, (exit_rect.x, exit_rect.y))
+
+        if pygame.mouse.get_focused():
+            sprite.rect.x, sprite.rect.y = pygame.mouse.get_pos()
+            all_sprites.draw(display)
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                running = False
+                return "exit"
+
+            if event.type == KEYDOWN:
+                if event.key == K_KP_ENTER:
+                    value = "play"
+        screen.blit(pygame.transform.scale(display, SCREEN_SIZE), (0, 0))
+        pygame.display.flip()
+
 
 
 if __name__ == '__main__':
     # save_game()
+    screen = pygame.display.set_mode(SCREEN_SIZE, 0, 32)
+    display = pygame.Surface(DISPLAY_SIZE, 0, 32)
+    a = menu(display, screen)
+    if a == "exit":
+        sys.exit(0)
+    elif a == "play":
+        pass
     open_save()
     jumper = 0
     global kicks, players, decoration_group, enemies, decoration_mobs, abilities_group, all_sprites, \
@@ -206,8 +270,7 @@ if __name__ == '__main__':
     runes = pygame.sprite.Group()
     poisons = pygame.sprite.Group()
     clock = pygame.time.Clock()
-    screen = pygame.display.set_mode(SCREEN_SIZE, 0, 32)
-    display = pygame.Surface(DISPLAY_SIZE, 0, 32)
+
     bullet_group = pygame.sprite.Group()
     partickles_group = pygame.sprite.Group()
     background_group = pygame.sprite.Group()
@@ -251,7 +314,7 @@ if __name__ == '__main__':
         enemies.draw(display)
         player.draw(display)
         decorations.decoration_group.draw(display)
-        
+
         if boss is not None:
             for bossK in bosses:  # без группы и следования по спрайтам в ней нельзя удалить спрайт, спасибо пайгейм
                 bossK.draw(display)
@@ -262,10 +325,12 @@ if __name__ == '__main__':
         if player.rune:
             ui.draw_runes(display, player)
         ui.draw_rnes_window(display)
-        ui.debug_mode(display, kicks, clock)
-        for mob in decoration_mobs:
-            mob.update(scroll)
-            mob.move()
+        if fps_show is True:
+            ui.debug_mode(display, kicks, clock)
+        if level <= 8:
+            for mob in decoration_mobs:
+                mob.update(scroll)
+                mob.move()
         a = 0
         for i in abilities_group:
             a = i.default()
@@ -281,6 +346,8 @@ if __name__ == '__main__':
                 for bossK in bosses:  # без группы и следования по спрайтам в ней нельзя удалить спрайт, спасибо пайгейм
                     bossK.update(scroll)
                     bossK.move(player, scroll_data, enemies)
+                    for i in abilities_group:
+                        i.kick(bossK, runes, poisons, i, False)
 
                     if pygame.sprite.spritecollide(bossK, players, False):
                         if bossK.contact == 7:
@@ -313,8 +380,7 @@ if __name__ == '__main__':
 
                 for enemy in enemies:
                     enemy.draw_hp(display)
-                    for i in abilities_group:
-                        i.kick(enemy, runes, poisons, i, False)
+
                     if pygame.sprite.spritecollide(enemy, kicks, False):
                         enemy.kick(player, runes, poisons, True)
                         if enemy.type_enemy == "eye" and enemy.alive is False and random.randint(0, 10) == 10:
@@ -411,7 +477,7 @@ if __name__ == '__main__':
                 running = False
             if event.type == KEYDOWN:
                 if event.key == K_F5:
-                    fps_show = -fps_show
+                    fps_show = not fps_show
                 if player.alive:
                     if event.key in [K_a, K_LEFT]:
                         moving_left = True

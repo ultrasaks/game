@@ -14,6 +14,9 @@ class UI:
         self.rect3 = self.image3.get_rect()
         self.image4 = pygame.transform.scale(
             load_image("UI/e_1.png"), (10, 10)).convert_alpha()
+        self.image5 = pygame.transform.scale(
+            load_image("UI/play1.png"), (60, 60)).convert_alpha()
+        self.rect5 = self.image5.get_rect()
         self.true = True
         self.font_debug = pygame.font.SysFont('sprites/8514fixr.fon', 50)
         self.font = pygame.font.SysFont('8514fixr', 30)
@@ -82,3 +85,6 @@ class UI:
         textsurface = font.render(text, False, (240, 240, 240))
         display.blit(
             textsurface, (DISPLAY_SIZE[0] - DISPLAY_SIZE[0] + 100, DISPLAY_SIZE[1] - 45))
+    def draw_play(self, display):
+        self.rect.center = (display.get_widht() // 2, display.get_height() // 2)
+        display.blit(self.image5, (self.rect.x, self.rect.y))
