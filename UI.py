@@ -76,3 +76,9 @@ class UI:
         textsurface = font.render(text, False, (240, 240, 240))
         display.blit(
             textsurface, (DISPLAY_SIZE[0] - DISPLAY_SIZE[0] + 100, DISPLAY_SIZE[1] - 45))
+    def draw_tomas(self, display):
+        text = "Томас Шелби с тобой! Урон повышен!"
+        font = pygame.font.SysFont('pressstart', 22)
+        textsurface = font.render(text, False, (240, 240, 240))
+        display.blit(
+            textsurface, (DISPLAY_SIZE[0] - DISPLAY_SIZE[0] + 100, DISPLAY_SIZE[1] - 45))

@@ -9,6 +9,7 @@ from Utilities.load_image import load_image
 import random
 from Enemies.slime import Slime
 from Enemies.rage_slime import RageSlime
+from items.poisons import Poison
 
 
 

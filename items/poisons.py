@@ -1,4 +1,6 @@
 import pygame
+import random
+from particles import *
 from Utilities.constants import *
 from Utilities.load_image import load_image
 
@@ -44,7 +46,7 @@ class Poison(pygame.sprite.Sprite):
         self.g = False
         self.vel_y = 0
 
-    def move(self, world):
+    def move(self, world, partickles_group):
         dx = 0
         dy = 0
         if self.in_air and not self.g:
@@ -66,6 +68,11 @@ class Poison(pygame.sprite.Sprite):
                     dy = tile[1].bottom - self.rect.top
                 # check if above the ground, i.e. falling
                 elif self.vel_y >= 0:
+                    if self.in_air:
+                        for i in range(20):
+                            speed = 0.3
+                            px = random.randint(1, 3)
+                            partickles_group.add(DustDown(self.rect, speed, px))
                     self.vel_y = 0
                     self.in_air = False
                     self.g = True

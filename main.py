@@ -9,9 +9,7 @@ from ast import literal_eval
 from pygame.locals import *
 
 import ability
-from Utilities.load_image import load_image
 from player import Player
-from items.item import Item
 from Utilities.camera import Camera
 from Utilities.constants import *
 from items.runes import *
@@ -30,21 +28,29 @@ newLevel = False
 scroll_data = []
 scroll = [0, 0]
 true_scroll = [0, 0]
-mountains_back_img = pygame.transform.scale(load_image("background/back_mount.png"), (A_scroll * 3, B_scroll * 3))
+# mountains_back_img = pygame.transform.scale(load_image("background/back_mount.png"), (A_scroll * 3, B_scroll * 3))
 mountains_img = pygame.transform.scale(load_image("background/mount.png"), (A_scroll * 3, B_scroll * 3))
-mountains_back = [[0 - mountains_back_img.get_width(), 0], [0, 0], [mountains_back_img.get_width(), 0]]
-mountains = [[0 - mountains_back_img.get_width(), 0], [0, 0], [mountains_back_img.get_width(), 0]]
+# mountains_back = [[0 - mountains_back_img.get_width(), 0], [0, 0], [mountains_back_img.get_width(), 0]]
+mountains = [[0 - mountains_img.get_width(), 0], [0, 0], [mountains_img.get_width(), 0]]
 background_1 = pygame.transform.scale(load_image("background/sky.png"), DISPLAY_SIZE)
 mountains_paralacks = (0.2, 0.15)
+dungeon_background = load_image("background/test.png")
+dungeon = [-300, -300]
+dungeon_paralacks = 0.6
 
 marvin_count = 0
+tomas_count = 0
+
+fps_show = -1
+rune, mana = ("", "")
 
 
 old_Inventory = None
 
-level = 1
+level = 0
 cutscenes = {0: [[410, 'Игрок бегает на кнопки [A]|[D] и [←]|[→]'], [300, 'Прыжок совершается на [W] или [↑]']],
-             1: [[300, 'У тебя в руке меч, это значит что ты можешь бить им на [SPACE] или [↓]']]}
+             1: [[300, 'У тебя в руке меч, это значит что ты можешь бить им на [SPACE] или [↓]']],
+             2: [[0, '']], 3: [[0, '']], 4: [[0, '']], 5: [[0, '']], 6: [[0, '']]}
 
 isCutscene = False
 
@@ -63,21 +69,24 @@ for x in range(500, 505):
 
 
 def draw_bg():
-    global level, mountains_back_img, mountains, mountains_back, mountains_img, background_1, mountains_paralacks
+    global level, mountains_back_img, mountains, mountains_back, mountains_img, background_1, mountains_paralacks, \
+        dungeon_paralacks, dungeon, dungeon_background
     if level <= 5:
-        mountains_back[0][0] -= scroll[0] * mountains_paralacks[0]
+
+
+        display.fill((0, 191, 255))
 
         mountains[0][0] -= scroll[0] * mountains_paralacks[1]
         mountains[1][0] -= scroll[0] * mountains_paralacks[1]
         mountains[2][0] -= scroll[0] * mountains_paralacks[1]
 
-        display.fill((0, 191, 255))
-        display.blit(mountains_back_img, (mountains[0][0], mountains[0][1]))
-
         for i in mountains:
             display.blit(mountains_img, (i[0], i[1]))
     else:
-        display.fill((0, 191, 255))
+
+        display.blit(dungeon_background, (dungeon[0], dungeon[1]))
+        dungeon[0] -= scroll[0] * dungeon_paralacks
+        dungeon[1] -= scroll[1] * dungeon_paralacks
 
 
 def kick():
@@ -115,8 +124,8 @@ def startup():
 
     decorations = Decor()
     pickups = Pickup()
-    mountains_back = [[0 - mountains_back_img.get_width(), 0], [0, 0], [mountains_back_img.get_width(), 0]]
-    mountains = [[0 - mountains_back_img.get_width(), 0], [0, 0], [mountains_back_img.get_width(), 0]]
+    # mountains_back = [[0 - mountains_back_img.get_width(), 0], [0, 0], [mountains_back_img.get_width(), 0]]
+    mountains = [[0 - mountains_img.get_width(), 0], [0, 0], [mountains_img.get_width(), 0]]
 
     world_data = []
     with open(f'levels/level{level}_data.csv', newline='') as csvfile:
@@ -174,15 +183,12 @@ def open_save():
             data = literal_eval(savefile.read().decode())
             level = data['level']
             old_Inventory = data['inventory']
-            runes = data["runes"]
-            mana = data["mana"]
-            player.rune, player.rune_type, player.rune_true = runes
-            player.mana, player.mana_count, player.mana_respawn = mana
+
 
 
 if __name__ == '__main__':
     # save_game()
-
+    open_save()
     jumper = 0
     global kicks, players, decoration_group, enemies, decoration_mobs, abilities_group, all_sprites, \
         sprite, image, decorations, pickups, world_data, world, player, camera, ui, cur_cutscene, boss
@@ -197,6 +203,7 @@ if __name__ == '__main__':
     screen = pygame.display.set_mode(SCREEN_SIZE, 0, 32)
     display = pygame.Surface(DISPLAY_SIZE, 0, 32)
     bullet_group = pygame.sprite.Group()
+    partickles_group = pygame.sprite.Group()
     background_group = pygame.sprite.Group()
 
     # background = pygame.sprite.Sprite()
@@ -215,6 +222,12 @@ if __name__ == '__main__':
     pygame.mixer.music.set_volume(vol)
 
     startup()
+    with open('savefile.json', 'rb') as savefile:
+        data = literal_eval(savefile.read().decode())
+        rune = data["runes"]
+        mana = data["mana"]
+        player.rune, player.rune_type, player.rune_true = rune
+        player.mana, player.mana_count, player.mana_respawn = mana
 
     running = True
     pygame.mouse.set_visible(False)
@@ -225,7 +238,7 @@ if __name__ == '__main__':
     abilityy = Ability()
 
     color_hp = (21, 143, 26)
-    open_save()
+
     while running:
         # print(true_scroll)
         if newLevel:
@@ -255,6 +268,7 @@ if __name__ == '__main__':
             runes.draw(display)
             poisons.draw(display)
             enemies.draw(display)
+            partickles_group.draw(display)
             player.draw(display)
             decorations.decoration_group.draw(display)
 
@@ -277,7 +291,7 @@ if __name__ == '__main__':
                     else:
                         bossK.contact = 0
                     if pygame.sprite.spritecollide(bossK, kicks, False):
-                        bossK.kick(player)
+                        bossK.kick(player, poisons)
 
 
             abilities_group.draw(display)
@@ -286,13 +300,30 @@ if __name__ == '__main__':
             if player.rune:
                 ui.draw_runes(display, player)
             ui.draw_rnes_window(display)
-            ui.debug_mode(display, kicks, clock)
-            for mob in decoration_mobs:
-                mob.update(scroll)
-                mob.move()
+            if fps_show > 0:
+                ui.debug_mode(display, kicks, clock)
+            if level <= 5:
+                for mob in decoration_mobs:
+                    mob.update(scroll)
+                    mob.move()
 
             player.update(scroll)
             if not isCutscene:
+                for i in partickles_group:
+                    i.update(scroll)
+                    i.move()
+                for item in runes:
+                    item.update(scroll)
+                    item.move(scroll_data, partickles_group)
+                    item.proverka(player, display, ui)
+
+                for poison in poisons:
+                    poison.update(scroll)
+                    poison.move(scroll_data)
+                    if pygame.sprite.spritecollide(poison, players, False):
+                        poison.poison_baf(player)
+
+
                 for enemy in enemies:
                     enemy.draw_hp(display)
                     for i in abilities_group:
@@ -317,16 +348,16 @@ if __name__ == '__main__':
                     if enemy.type_enemy == "eye":
                         bullet_group = enemy.move(player, scroll_data)
                     else:
-                        enemy.move(player, scroll_data)
+                        enemy.move(player, scroll_data, partickles_group)
 
                     bullet_group.draw(display)
                     for i in bullet_group:
                         if pygame.sprite.spritecollide(i, players, False):
                             player.kick(i)
                             bullet_kick.play()
-                            i.kill()
+                            i.kick(partickles_group)
                         if pygame.sprite.spritecollide(i, kicks, False):
-                            i.kick()
+                            i.kick(partickles_group)
                         i.update(scroll)
                         i.move(player, scroll_data)
 
@@ -336,22 +367,17 @@ if __name__ == '__main__':
                     if marvin_count >= 90:
                         player.marvin = False
                         marvin_count = 0
+                if player.tomas:
+                    ui.draw_tomas(display)
+                    tomas_count += 1
+                    if tomas_count >= 90:
+                        player.tomas = False
+                        tomas_count = 0
 
                 if player.alive:
-                    player.move(moving_left, moving_right, scroll_data)
+                    player.move(moving_left, moving_right, scroll_data, partickles_group)
                 else:
                     startup()
-
-                for item in runes:
-                    item.update(scroll)
-                    item.move(scroll_data)
-                    item.proverka(player, display, ui)
-
-                for poison in poisons:
-                    poison.update(scroll)
-                    poison.move(scroll_data)
-                    if pygame.sprite.spritecollide(poison, players, False):
-                        poison.poison_baf(player)
 
             else:
                 for enemy in enemies:
@@ -415,6 +441,8 @@ if __name__ == '__main__':
             if event.type == QUIT:
                 running = False
             if event.type == KEYDOWN:
+                if event.key == K_F5:
+                    fps_show = -fps_show
                 if player.alive:
                     if event.key in [K_a, K_LEFT]:
                         moving_left = True
