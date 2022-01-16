@@ -33,10 +33,10 @@ mountains_img = pygame.transform.scale(load_image("background/mount.png"), (A_sc
 # mountains_back = [[0 - mountains_back_img.get_width(), 0], [0, 0], [mountains_back_img.get_width(), 0]]
 mountains = [[0 - mountains_img.get_width(), 0], [0, 0], [mountains_img.get_width(), 0]]
 background_1 = pygame.transform.scale(load_image("background/sky.png"), DISPLAY_SIZE)
-mountains_paralacks = (0.2, 0.15)
+mountains_parralax = (0.2, 0.15)
 dungeon_background = load_image("background/test.png")
 dungeon = [-300, -300]
-dungeon_paralacks = 0.6
+dungeon_parralax = 0.6
 
 marvin_count = 0
 tomas_count = 0
@@ -47,7 +47,7 @@ rune, mana = ("", "")
 
 old_Inventory = None
 
-level = 0
+level = 2
 cutscenes = {0: [[410, 'Игрок бегает на кнопки [A]|[D] и [←]|[→]'], [300, 'Прыжок совершается на [W] или [↑]']],
              1: [[300, 'У тебя в руке меч, это значит что ты можешь бить им на [SPACE] или [↓]']],
              2: [[0, '']], 3: [[0, '']], 4: [[0, '']], 5: [[0, '']], 6: [[0, '']]}
@@ -69,24 +69,22 @@ for x in range(500, 505):
 
 
 def draw_bg():
-    global level, mountains_back_img, mountains, mountains_back, mountains_img, background_1, mountains_paralacks, \
-        dungeon_paralacks, dungeon, dungeon_background
-    if level <= 5:
-
-
+    global level, mountains_back_img, mountains, mountains_back, mountains_img, background_1, mountains_parralax, \
+        dungeon_parralax, dungeon, dungeon_background
+    if level <= 8:
         display.fill((0, 191, 255))
-
-        mountains[0][0] -= scroll[0] * mountains_paralacks[1]
-        mountains[1][0] -= scroll[0] * mountains_paralacks[1]
-        mountains[2][0] -= scroll[0] * mountains_paralacks[1]
+        if not pause:
+            mountains[0][0] -= scroll[0] * mountains_parralax[1]
+            mountains[1][0] -= scroll[0] * mountains_parralax[1]
+            mountains[2][0] -= scroll[0] * mountains_parralax[1]
 
         for i in mountains:
             display.blit(mountains_img, (i[0], i[1]))
+        decoration_mobs.draw(display)
     else:
-
         display.blit(dungeon_background, (dungeon[0], dungeon[1]))
-        dungeon[0] -= scroll[0] * dungeon_paralacks
-        dungeon[1] -= scroll[1] * dungeon_paralacks
+        dungeon[0] -= scroll[0] * dungeon_parralax
+        dungeon[1] -= scroll[1] * dungeon_parralax
 
 
 def kick():
@@ -105,7 +103,8 @@ def kick():
 def startup():
     global kicks, players, decoration_group, enemies, decoration_mobs, abilities_group, all_sprites, \
         sprite, image, decorations, pickups, world_data, world, player, camera, ui, old_Inventory, cur_cutscene, \
-        boss, bosses, mountains_back_img, mountains, mountains_back, mountains_img, background_1, mountains_paralacks
+        boss, bosses, mountains_back_img, mountains, mountains_back, mountains_img, background_1, \
+        mountains_parralax, Rrune, Rmana
     kicks = pygame.sprite.Group()
     boss = None
     decoration_group = pygame.sprite.Group()
@@ -149,11 +148,17 @@ def startup():
     if players:
         if player.hp > 0:
             old_Inventory = [player.defence, player.hp, player.damage]
+            Rrune = [player.rune, player.rune_type, player.rune_true]
+            Rmana = [player.mana, player.mana_count, player.mana_respawn]
         players.empty()
         player, boss = world.process_data(world_data, decorations, enemies, pickups, old_Inventory)
+        player.rune, player.rune_type, player.rune_true = Rrune
+        player.mana, player.mana_count, player.mana_respawn = Rmana
     elif old_Inventory:
         players.empty()
         player, boss = world.process_data(world_data, decorations, enemies, pickups, old_Inventory)
+        player.rune, player.rune_type, player.rune_true = Rrune
+        player.mana, player.mana_count, player.mana_respawn = Rmana
     else:
         player, boss = world.process_data(world_data, decorations, enemies, pickups)
     old_Inventory = [player.defence, player.hp, player.damage]
@@ -172,18 +177,19 @@ def startup():
 def save_game():
     with open('savefile.json', 'wb') as savefile:
         savefile.write(str.encode(str({'level': level, 'inventory': old_Inventory,
-                                       'runes':[player.rune, player.rune_type, player.rune_true],
-                                       'mana':[player.mana, player.mana_count, player.mana_respawn]})))
+                                       'runes': [player.rune, player.rune_type, player.rune_true],
+                                       'mana': [player.mana, player.mana_count, player.mana_respawn]})))
 
 
 def open_save():
-    global level, old_Inventory
+    global level, old_Inventory, Rrune, Rmana
     if os.path.exists('savefile.json'):
         with open('savefile.json', 'rb') as savefile:
             data = literal_eval(savefile.read().decode())
             level = data['level']
             old_Inventory = data['inventory']
-
+            Rrune = data["runes"]
+            Rmana = data["mana"]
 
 
 if __name__ == '__main__':
@@ -206,12 +212,6 @@ if __name__ == '__main__':
     partickles_group = pygame.sprite.Group()
     background_group = pygame.sprite.Group()
 
-    # background = pygame.sprite.Sprite()
-    # background.image = load_image('background/test.png')
-    # background.rect = background.image.get_rect()
-    # background.rect.x = background.rect.x - 500
-    # background_group.add(background)
-
     kick_sound = pygame.mixer.Sound("sounds/kick.wav")
     jump_sound = pygame.mixer.Sound("sounds/jump.wav")
     jump2_sound = pygame.mixer.Sound("sounds/djump.wav")
@@ -222,59 +222,63 @@ if __name__ == '__main__':
     pygame.mixer.music.set_volume(vol)
 
     startup()
-    with open('savefile.json', 'rb') as savefile:
-        data = literal_eval(savefile.read().decode())
-        rune = data["runes"]
-        mana = data["mana"]
-        player.rune, player.rune_type, player.rune_true = rune
-        player.mana, player.mana_count, player.mana_respawn = mana
 
     running = True
     pygame.mouse.set_visible(False)
-
     pause = False
     eventer = ""
-
     abilityy = Ability()
-
     color_hp = (21, 143, 26)
 
     while running:
-        # print(true_scroll)
         if newLevel:
             level += 1
             startup()
             newLevel = False
             save_game()
 
+        draw_bg()
+
+        world.draw(display, scroll_data)
+
+        pickups.pickups_group.draw(display)
+
+        for i in abilities_group:
+            i.draw2(display)
+        runes.draw(display)
+        poisons.draw(display)
+        partickles_group.draw(display)
+        enemies.draw(display)
+        player.draw(display)
+        decorations.decoration_group.draw(display)
+        
+        if boss is not None:
+            for bossK in bosses:  # без группы и следования по спрайтам в ней нельзя удалить спрайт, спасибо пайгейм
+                bossK.draw(display)
+
+        abilities_group.draw(display)
+        ui.draw_hp(player, display, color_hp)
+        ui.draw_mana(display, player)
+        if player.rune:
+            ui.draw_runes(display, player)
+        ui.draw_rnes_window(display)
+        ui.debug_mode(display, kicks, clock)
+        for mob in decoration_mobs:
+            mob.update(scroll)
+            mob.move()
+        a = 0
+        for i in abilities_group:
+            a = i.default()
+        if not a:
+            color_hp = (21, 143, 26)
+        else:
+            color_hp = (20, 30, 255)
         if not pause:
-            a = 0
-            for i in abilities_group:
-                a = i.default()
-            if not a:
-                color_hp = (21, 143, 26)
-            else:
-                color_hp = (20, 30, 255)
             scroll_data = camera.obstacle_list(
                 world, scroll, decorations, pickups)
-            draw_bg()
-            decoration_mobs.draw(display)
-            world.draw(display, scroll_data)
-
-            pickups.pickups_group.draw(display)
-
-            for i in abilities_group:
-                i.draw2(display)
-            runes.draw(display)
-            poisons.draw(display)
-            enemies.draw(display)
-            partickles_group.draw(display)
-            player.draw(display)
-            decorations.decoration_group.draw(display)
-
+            player.update(scroll)
             if boss is not None:
                 for bossK in bosses:  # без группы и следования по спрайтам в ней нельзя удалить спрайт, спасибо пайгейм
-                    bossK.draw(display)
                     bossK.update(scroll)
                     bossK.move(player, scroll_data, enemies)
 
@@ -292,22 +296,6 @@ if __name__ == '__main__':
                         bossK.contact = 0
                     if pygame.sprite.spritecollide(bossK, kicks, False):
                         bossK.kick(player, poisons)
-
-
-            abilities_group.draw(display)
-            ui.draw_hp(player, display, color_hp)
-            ui.draw_mana(display, player)
-            if player.rune:
-                ui.draw_runes(display, player)
-            ui.draw_rnes_window(display)
-            if fps_show > 0:
-                ui.debug_mode(display, kicks, clock)
-            if level <= 5:
-                for mob in decoration_mobs:
-                    mob.update(scroll)
-                    mob.move()
-
-            player.update(scroll)
             if not isCutscene:
                 for i in partickles_group:
                     i.update(scroll)
@@ -319,10 +307,9 @@ if __name__ == '__main__':
 
                 for poison in poisons:
                     poison.update(scroll)
-                    poison.move(scroll_data)
+                    poison.move(scroll_data, partickles_group)
                     if pygame.sprite.spritecollide(poison, players, False):
                         poison.poison_baf(player)
-
 
                 for enemy in enemies:
                     enemy.draw_hp(display)
@@ -378,7 +365,6 @@ if __name__ == '__main__':
                     player.move(moving_left, moving_right, scroll_data, partickles_group)
                 else:
                     startup()
-
             else:
                 for enemy in enemies:
                     enemy.update(scroll)
@@ -394,8 +380,7 @@ if __name__ == '__main__':
             if pygame.sprite.spritecollide(player, pickups.pickups_group, False):
                 for pickup in pickups.pickups_group:
                     if pygame.sprite.spritecollide(pickup, players, False):
-                        newLevel, isCutscene = pickup.touch(
-                            player, newLevel, isCutscene)
+                        newLevel, isCutscene = pickup.touch(player, newLevel, isCutscene)
 
             kicks.empty()
 
@@ -404,28 +389,12 @@ if __name__ == '__main__':
                 i.move(player, scroll)
                 i.clocker(player)
 
-            true_scroll[0] = (player.rect.center[0] -
-                              true_scroll[0] - A_scroll) // 15
-            true_scroll[1] = (player.rect.center[1] -
-                              true_scroll[1] - B_scroll) // 15
+            true_scroll[0] = (player.rect.center[0] - true_scroll[0] - A_scroll) // 15
+            true_scroll[1] = (player.rect.center[1] - true_scroll[1] - B_scroll) // 15
             scroll = true_scroll.copy()
             scroll[0], scroll[1] = int(scroll[0]), int(scroll[1])
 
         else:
-            # moving_left = False
-            # moving_right = False
-            draw_bg()
-            decoration_mobs.draw(display)
-            world.draw(display, scroll_data)
-            for i in abilities_group:
-                i.draw2(display)
-
-            enemies.draw(display)
-            player.draw(display)
-
-            abilities_group.draw(display)
-            ui.draw_hp(player, display, color_hp)
-            ui.draw_mana(display, player)
             if eventer == "ability":
                 a = abilityy.update(player, ui)
                 if a == 0:
