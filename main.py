@@ -72,10 +72,7 @@ def draw_bg():
     global level, mountains_back_img, mountains, mountains_back, mountains_img, background_1, mountains_paralacks, \
         dungeon_paralacks, dungeon, dungeon_background
     if level <= 5:
-
-
         display.fill((0, 191, 255))
-
         mountains[0][0] -= scroll[0] * mountains_paralacks[1]
         mountains[1][0] -= scroll[0] * mountains_paralacks[1]
         mountains[2][0] -= scroll[0] * mountains_paralacks[1]
@@ -240,41 +237,55 @@ if __name__ == '__main__':
     color_hp = (21, 143, 26)
 
     while running:
-        # print(true_scroll)
         if newLevel:
             level += 1
             startup()
             newLevel = False
             save_game()
 
+        draw_bg()
+        decoration_mobs.draw(display)
+        world.draw(display, scroll_data)
+
+        pickups.pickups_group.draw(display)
+
+        for i in abilities_group:
+            i.draw2(display)
+        runes.draw(display)
+        poisons.draw(display)
+        partickles_group.draw(display)
+        enemies.draw(display)
+        player.draw(display)
+        decorations.decoration_group.draw(display)
+        if boss is not None:
+            for bossK in bosses:  # без группы и следования по спрайтам в ней нельзя удалить спрайт, спасибо пайгейм
+                bossK.draw(display)
+
+
+        abilities_group.draw(display)
+        ui.draw_hp(player, display, color_hp)
+        ui.draw_mana(display, player)
+        if player.rune:
+            ui.draw_runes(display, player)
+        ui.draw_rnes_window(display)
+        # ui.debug_mode(display, kicks, clock)
+        for mob in decoration_mobs:
+            mob.update(scroll)
+            mob.move()
+        a = 0
+        for i in abilities_group:
+            a = i.default()
+        if not a:
+            color_hp = (21, 143, 26)
+        else:
+            color_hp = (20, 30, 255)
         if not pause:
-            a = 0
-            for i in abilities_group:
-                a = i.default()
-            if not a:
-                color_hp = (21, 143, 26)
-            else:
-                color_hp = (20, 30, 255)
+
             scroll_data = camera.obstacle_list(
                 world, scroll, decorations, pickups)
-            draw_bg()
-            decoration_mobs.draw(display)
-            world.draw(display, scroll_data)
-
-            pickups.pickups_group.draw(display)
-
-            for i in abilities_group:
-                i.draw2(display)
-            runes.draw(display)
-            poisons.draw(display)
-            enemies.draw(display)
-            partickles_group.draw(display)
-            player.draw(display)
-            decorations.decoration_group.draw(display)
-
+            player.update(scroll)
             if boss is not None:
                 for bossK in bosses:  # без группы и следования по спрайтам в ней нельзя удалить спрайт, спасибо пайгейм
-                    bossK.draw(display)
                     bossK.update(scroll)
                     bossK.move(player, scroll_data, enemies)
 
@@ -292,22 +303,6 @@ if __name__ == '__main__':
                         bossK.contact = 0
                     if pygame.sprite.spritecollide(bossK, kicks, False):
                         bossK.kick(player, poisons)
-
-
-            abilities_group.draw(display)
-            ui.draw_hp(player, display, color_hp)
-            ui.draw_mana(display, player)
-            if player.rune:
-                ui.draw_runes(display, player)
-            ui.draw_rnes_window(display)
-            if fps_show > 0:
-                ui.debug_mode(display, kicks, clock)
-            if level <= 5:
-                for mob in decoration_mobs:
-                    mob.update(scroll)
-                    mob.move()
-
-            player.update(scroll)
             if not isCutscene:
                 for i in partickles_group:
                     i.update(scroll)
@@ -412,20 +407,6 @@ if __name__ == '__main__':
             scroll[0], scroll[1] = int(scroll[0]), int(scroll[1])
 
         else:
-            # moving_left = False
-            # moving_right = False
-            draw_bg()
-            decoration_mobs.draw(display)
-            world.draw(display, scroll_data)
-            for i in abilities_group:
-                i.draw2(display)
-
-            enemies.draw(display)
-            player.draw(display)
-
-            abilities_group.draw(display)
-            ui.draw_hp(player, display, color_hp)
-            ui.draw_mana(display, player)
             if eventer == "ability":
                 a = abilityy.update(player, ui)
                 if a == 0:

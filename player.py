@@ -7,12 +7,12 @@ import math
 
 
 class Player(pygame.sprite.Sprite):
-    baseSprite = load_image("test_sprite.png")
-    runSprite = load_image('test_sprite_step.png')
-    runSprite2 = load_image('test_sprite_step2.png')
-    jumpSprite = load_image('test_sprite_jump.png')
-    fallSprite = load_image('test_sprite_fall.png')
-    kickSprite = load_image('test_sprite_kick.png')
+    baseSprite = load_image("player/base.png")
+    runSprite = load_image('player/step.png')
+    runSprite2 = load_image('player/step2.png')
+    jumpSprite = load_image('player/jump.png')
+    fallSprite = load_image('player/fall.png')
+    kickSprite = load_image('player/kick.png')
 
     def __init__(self, x, y, speed=5, inventory=None, *group):
         super().__init__(*group)
