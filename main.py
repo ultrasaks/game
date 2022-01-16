@@ -35,7 +35,6 @@ mountains = [[0 - mountains_img.get_width(), 0], [0, 0], [mountains_img.get_widt
 background_1 = pygame.transform.scale(load_image("background/sky.png"), DISPLAY_SIZE)
 mountains_parralax = (0.2, 0.15)
 dungeon_background = load_image("background/test.png")
-dungeon = [-300, -300]
 dungeon_parralax = 0.6
 
 marvin_count = 0
@@ -86,6 +85,7 @@ def draw_bg():
         if not pause:
             dungeon[0] -= scroll[0] * dungeon_parralax
             dungeon[1] -= scroll[1] * dungeon_parralax
+    print(dungeon)
 
 
 def kick():
@@ -105,7 +105,7 @@ def startup():
     global kicks, players, decoration_group, enemies, decoration_mobs, abilities_group, all_sprites, \
         sprite, image, decorations, pickups, world_data, world, player, camera, ui, old_Inventory, cur_cutscene, \
         boss, bosses, mountains_back_img, mountains, mountains_back, mountains_img, background_1, \
-        mountains_parralax, Rrune, Rmana
+        mountains_parralax, Rrune, Rmana, dungeon
     kicks = pygame.sprite.Group()
     boss = None
     decoration_group = pygame.sprite.Group()
@@ -113,6 +113,7 @@ def startup():
     decoration_mobs = pygame.sprite.Group()
     abilities_group = pygame.sprite.Group()
     bosses = pygame.sprite.Group()
+    dungeon = [-300, -300]
 
     all_sprites = pygame.sprite.Group()
     sprite = pygame.sprite.Sprite()
