@@ -450,6 +450,7 @@ if __name__ == '__main__':
                         if pygame.sprite.spritecollide(bossK, kicks, False):
                             bossK.kick(player, poisons)
                 if not isCutscene:
+
                     for i in partickles_group:
                         i.update(scroll)
                         i.move()
@@ -466,7 +467,8 @@ if __name__ == '__main__':
 
                     for enemy in enemies:
                         enemy.draw_hp(display)
-
+                        for i in abilities_group:
+                            i.kick(enemy, runes, poisons, i, False)
                         if pygame.sprite.spritecollide(enemy, kicks, False):
                             enemy.kick(player, runes, poisons, True)
                             if enemy.type_enemy == "eye" and enemy.alive is False and random.randint(0, 10) == 10:
@@ -548,6 +550,8 @@ if __name__ == '__main__':
 
             else:
                 if eventer == "ability":
+                    moving_left = False
+                    moving_right = False
                     a = abilityy.update(player, ui)
                     if a == 0:
                         abilityy.draw(display)
