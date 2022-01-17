@@ -35,6 +35,7 @@ class Poison(pygame.sprite.Sprite):
             self.image = pygame.transform.scale(load_image(
                 "item/Marvin-SHTF.png"), (30, 30)).convert_alpha()
             self.sound_poison = pygame.mixer.Sound("sounds/secret_poison.wav")
+        self.sound_poison.set_volume(0.4)
 
         self.rect = self.image.get_rect()
         self.rect.x = x
