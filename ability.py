@@ -112,23 +112,23 @@ class Ability():
         self.s2 = pygame.mixer.Sound("sounds/shield.wav")
         self.display = pygame.Surface(DISPLAY_SIZE)
         self.background = pygame.transform.scale(load_image(
-            "abilities/background_dop.png"), DISPLAY_SIZE).convert_alpha()
+            "UI/pause_back.png"), DISPLAY_SIZE).convert_alpha()
         self.image00 = pygame.transform.scale(load_image(
-            "abilities/ability00.png"), (256 / 2, 384 / 2)).convert_alpha()
+            "abilities/ability00.png"), (256, 384)).convert_alpha()
         self.image01 = pygame.transform.scale(load_image(
-            "abilities/ability01.png"), (256 / 2, 384 / 2)).convert_alpha()
+            "abilities/ability01.png"), (256, 384)).convert_alpha()
         self.image10 = pygame.transform.scale(load_image(
-            "abilities/ability10.png"), (256 / 2, 384 / 2)).convert_alpha()
+            "abilities/ability10.png"), (256, 384)).convert_alpha()
         self.image11 = pygame.transform.scale(load_image(
-            "abilities/ability11.png"), (256 / 2, 384 / 2)).convert_alpha()
+            "abilities/ability11.png"), (256, 384)).convert_alpha()
         self.image1 = self.image00
         self.image2 = self.image10
         self.rect1 = self.image1.get_rect()
         self.rect2 = self.image2.get_rect()
-        self.rect1.x, self.rect1.y = (
-            DISPLAY_SIZE[0] // 2 // 2, DISPLAY_SIZE[1] // 2 // 2)
-        self.rect2.x, self.rect2.y = (
-            self.rect1.x + 300, DISPLAY_SIZE[1] // 2 // 2)
+        self.rect1.center = (
+            DISPLAY_SIZE[0] // 2 // 2, DISPLAY_SIZE[1] // 2)
+        self.rect2.center = (DISPLAY_SIZE[0] // 2 +
+            DISPLAY_SIZE[0] // 2 // 2, DISPLAY_SIZE[1] // 2)
 
     def update(self, player, ui):
         ability = 0
