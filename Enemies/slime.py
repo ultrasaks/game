@@ -141,7 +141,6 @@ class Slime(pygame.sprite.Sprite):
                                 random.choice(["heal", "mana", "heal", "regen", "mana", "heal", "mana", "heal", "regen", "mana", "super", "super", "secret"]))
                 groups2.add(poison)
 
-
     def update(self, scroll):
         self.rect.x -= scroll[0]
         self.rect.y -= scroll[1]
