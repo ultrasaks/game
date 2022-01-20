@@ -1,17 +1,18 @@
 from Utilities.load_image import load_image
 import pygame
 from Utilities.constants import *
+from particles import *
 import random
 import math
 
 
 class Player(pygame.sprite.Sprite):
-    baseSprite = load_image("test_sprite.png")
-    runSprite = load_image('test_sprite_step.png')
-    runSprite2 = load_image('test_sprite_step2.png')
-    jumpSprite = load_image('test_sprite_jump.png')
-    fallSprite = load_image('test_sprite_fall.png')
-    kickSprite = load_image('test_sprite_kick.png')
+    baseSprite = load_image("player/base.png")
+    runSprite = load_image('player/step.png')
+    runSprite2 = load_image('player/step2.png')
+    jumpSprite = load_image('player/jump.png')
+    fallSprite = load_image('player/fall.png')
+    kickSprite = load_image('player/kick.png')
 
     def __init__(self, x, y, speed=5, inventory=None, *group):
         super().__init__(*group)
@@ -27,7 +28,7 @@ class Player(pygame.sprite.Sprite):
         self.alive = True
         self.doubleJ = False
 
-        self.defence = 1  # потом
+        self.defence = 1
         self.defence_dop = 1
         self.damage = [15, 30]
         self.mana = True
@@ -39,7 +40,7 @@ class Player(pygame.sprite.Sprite):
         self.regen = False
         self.regen_count = 0
 
-        self.hp = 100  # потом
+        self.hp = 100
         self.width = self.image.get_width()
         self.height = self.image.get_height()
         self.spriteN = 0
@@ -48,7 +49,8 @@ class Player(pygame.sprite.Sprite):
         self.delay = 0
 
         self.marvin = False
-
+        self.tomas = False
+        self.runn = 0
         if inventory is None:
             self.inventory = [0, 100, [15, 30]]
         else:
@@ -57,7 +59,7 @@ class Player(pygame.sprite.Sprite):
             self.hp = inventory[1]
             self.damage = inventory[2]
 
-    def move(self, moving_left, moving_right, world):
+    def move(self, moving_left, moving_right, world, partickles_group):
         # движение за этот ход
         sprite_cadr = 6
         dx = 0
@@ -72,16 +74,27 @@ class Player(pygame.sprite.Sprite):
             dx = -self.speed
             if self.in_air:
                 dx -= 1
+            else:
+                if self.runn <= 0:
+                    self.runn = 7
+                    partickles_group.add(DustRun(self.rect, self.flip, 0.05, random.randint(2, 3)))
+
             self.flip = True
             self.direction = -1
+
         if moving_right:
             dx = self.speed
             if self.in_air:
                 dx += 1
+            else:
+                if self.runn <= 0:
+                    self.runn = 7
+                    partickles_group.add(DustRun(self.rect, self.flip, 0.05, random.randint(2, 3)))
             self.flip = False
             self.direction = 1
 
         if moving_left or moving_right:  # спрайты во время бега
+            self.runn -= 1
             self.spriteN += 1
             if self.spriteN >= sprite_cadr:  # за сколько кадров сменяется спрайт
                 self.spriteN = 0
@@ -122,10 +135,14 @@ class Player(pygame.sprite.Sprite):
                     dy = tile[1].bottom - self.rect.top
                 # check if above the ground, i.e. falling
                 elif self.vel_y >= 0:
+                    if self.in_air:
+                        for i in range(20):
+                            speed = random.choice([0.3, 0.5, 0.2, 1])
+                            px = random.randint(1, 4)
+                            partickles_group.add(DustDown(self.rect, speed, px))
                     self.vel_y = 0
                     self.in_air = False
                     dy = tile[1].top - self.rect.bottom
-
         if dy > GRAVITY:
             # падение
             self.image = self.fallSprite

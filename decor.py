@@ -11,4 +11,5 @@ class Decor:
         decoration.image = img
         decoration.rect = decoration.image.get_rect()
         decoration.rect.x, decoration.rect.y = x, y
+
         self.decoration_group.add(decoration)

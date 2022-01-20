@@ -8,6 +8,7 @@ from Utilities.constants import *
 from Utilities.load_image import load_image
 from items.poisons import Poison
 from items.runes import *
+from particles import *
 import random
 
 # slime
@@ -48,7 +49,7 @@ class RageSlime(pygame.sprite.Sprite):
         self.contact = 0
         self.type_enemy = "slime"
 
-    def move(self, player, world, tolchok=0):
+    def move(self, player, world, partickles_group, tolchok=0):
         dx = 0
         dy = 0
         if self.NN >= 15:
@@ -94,6 +95,11 @@ class RageSlime(pygame.sprite.Sprite):
                     dy = tile[1].bottom - self.rect.top
                 # check if above the ground, i.e. falling
                 elif self.vel_y >= 0:
+                    if self.in_air:
+                        for i in range(20):
+                            speed = random.choice([0.3, 0.5, 0.2])
+                            px = random.randint(1, 4)
+                            partickles_group.add(DustDown(self.rect, speed, px))
                     self.vel_y = 0
                     self.in_air = False
                     dy = tile[1].top - self.rect.bottom

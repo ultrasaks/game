@@ -8,6 +8,7 @@ from pygame.locals import *
 from Utilities.constants import *
 from Utilities.load_image import load_image
 from items.runes import *
+from particles import *
 from items.poisons import Poison
 from items.runes import *
 import random
@@ -50,7 +51,11 @@ class Bullet(pygame.sprite.Sprite):
         if self.NN >= 360:
             self.kill()
 
-    def kick(self):
+    def kick(self, partickles_group):
+        for i in range(10):
+            speed = random.choice([0.2, 0.6, 1])
+            px = random.randint(1, 4)
+            partickles_group.add(DustBullet(self.rect,speed, px ))
         self.dead_sound.play()
         self.kill()
 

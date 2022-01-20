@@ -13,6 +13,7 @@ from pickups.exit import Exit
 from pickups.cutscene import Cutscene
 from pickups.death import Death
 from pickups.bebra import Bebra
+from pickups.heal import Heal
 
 
 class World:
@@ -54,14 +55,17 @@ class World:
                         pickups.add_pickup(Death(), x * 38, y * 38)
                     elif tile == 704:
                         pickups.add_pickup(Bebra(), x * 38, y * 38)
+                    elif tile == 705:
+                        pickups.add_pickup(Heal(), x * 38, y * 38)
 
                     elif tile == 800:
                         slime = Slime(x * 38, y * 38, 2)
                         enemies.add(slime)
-
+                    elif tile == 801:
+                        slime = RageSlime(x * 38, y * 38, 2)
+                        enemies.add(slime)
                     elif tile == 802:
                         boss = Boss(x * 38 + 10, y * 38, 2)
-                        # enemies.add(boss)
                     elif tile == 803:
                         eye = Eye(x * 38 + 10, y * 38, 2)
                         enemies.add(eye)
