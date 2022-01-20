@@ -57,6 +57,7 @@ class DustRun(pygame.sprite.Sprite):
         self.rect.x -= scroll[0]
         self.rect.y -= scroll[1]
 
+
 class DustBullet(pygame.sprite.Sprite):
     def __init__(self, rect, speed, px , *group):
         super().__init__(*group)

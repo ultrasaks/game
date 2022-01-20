@@ -137,6 +137,7 @@ class Boss(pygame.sprite.Sprite):
         if self.hp <= 0:
             player.mana_count += 3
             self.kill()
+            self.alive = False
             poison = Poison(self.rect.x, self.rect.y + 18, 0, random.choice(["secret"]))
             groups2.add(poison)
 

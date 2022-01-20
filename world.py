@@ -61,10 +61,11 @@ class World:
                     elif tile == 800:
                         slime = Slime(x * 38, y * 38, 2)
                         enemies.add(slime)
-
+                    elif tile == 801:
+                        slime = RageSlime(x * 38, y * 38, 2)
+                        enemies.add(slime)
                     elif tile == 802:
                         boss = Boss(x * 38 + 10, y * 38, 2)
-                        # enemies.add(boss)
                     elif tile == 803:
                         eye = Eye(x * 38 + 10, y * 38, 2)
                         enemies.add(eye)

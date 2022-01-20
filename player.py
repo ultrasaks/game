@@ -28,7 +28,7 @@ class Player(pygame.sprite.Sprite):
         self.alive = True
         self.doubleJ = False
 
-        self.defence = 1  # потом
+        self.defence = 1
         self.defence_dop = 1
         self.damage = [15, 30]
         self.mana = True
@@ -40,7 +40,7 @@ class Player(pygame.sprite.Sprite):
         self.regen = False
         self.regen_count = 0
 
-        self.hp = 100  # потом
+        self.hp = 100
         self.width = self.image.get_width()
         self.height = self.image.get_height()
         self.spriteN = 0

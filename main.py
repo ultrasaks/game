@@ -25,18 +25,16 @@ from pickup import Pickup
 moving_left = False
 moving_right = False
 newLevel = False
+final = False
 
 scroll_data = []
 scroll = [0, 0]
 true_scroll = [0, 0]
-# mountains_back_img = pygame.transform.scale(load_image("background/back_mount.png"), (A_scroll * 3, B_scroll * 3))
 mountains_img = pygame.transform.scale(load_image("background/mount.png"), (A_scroll * 3, B_scroll * 3))
-# mountains_back = [[0 - mountains_back_img.get_width(), 0], [0, 0], [mountains_back_img.get_width(), 0]]
 mountains = [[0 - mountains_img.get_width(), 0], [0, 0], [mountains_img.get_width(), 0]]
 background_1 = pygame.transform.scale(load_image("background/sky.png"), DISPLAY_SIZE)
 mountains_parralax = (0.2, 0.15)
 dungeon_background = load_image("background/test.png")
-dungeon = [-300, -300]
 dungeon_parralax = 0.6
 
 marvin_count = 0
@@ -51,7 +49,8 @@ old_Inventory = None
 level = 2
 cutscenes = {0: [[410, 'Игрок бегает на кнопки [A]|[D] и [←]|[→]'], [300, 'Прыжок совершается на [W] или [↑]']],
              1: [[300, 'У тебя в руке меч, это значит что ты можешь бить им на [SPACE] или [↓]']],
-             2: [[0, '']], 3: [[0, '']], 4: [[0, '']], 5: [[0, '']], 6: [[0, '']]}
+             16: [[300, 'Дальше ты встретишься с котом, он захочет съесть тебя -- будь начеку!']],
+             17: [[400, 'Поздравляю, ты прошёл игру! Делать тут больше нечего, концовки нет.']]}
 
 isCutscene = False
 
@@ -73,7 +72,7 @@ for x in range(500, 505):
 def draw_bg():
     global level, mountains_back_img, mountains, mountains_back, mountains_img, background_1, mountains_parralax, \
         dungeon_parralax, dungeon, dungeon_background
-    if level <= 8:
+    if level <= 7:
         display.fill((0, 191, 255))
         if not pause:
             mountains[0][0] -= scroll[0] * mountains_parralax[1]
@@ -85,8 +84,9 @@ def draw_bg():
         decoration_mobs.draw(display)
     else:
         display.blit(dungeon_background, (dungeon[0], dungeon[1]))
-        dungeon[0] -= scroll[0] * dungeon_parralax
-        dungeon[1] -= scroll[1] * dungeon_parralax
+        if not pause:
+            dungeon[0] -= scroll[0] * dungeon_parralax
+            dungeon[1] -= scroll[1] * dungeon_parralax
 
 
 def kick():
@@ -106,7 +106,7 @@ def startup():
     global kicks, players, decoration_group, enemies, decoration_mobs, abilities_group, all_sprites, \
         sprite, image, decorations, pickups, world_data, world, player, camera, ui, old_Inventory, cur_cutscene, \
         boss, bosses, mountains_back_img, mountains, mountains_back, mountains_img, background_1, \
-        mountains_parralax, Rrune, Rmana
+        mountains_parralax, Rrune, Rmana, dungeon
     kicks = pygame.sprite.Group()
     boss = None
     decoration_group = pygame.sprite.Group()
@@ -114,6 +114,7 @@ def startup():
     decoration_mobs = pygame.sprite.Group()
     abilities_group = pygame.sprite.Group()
     bosses = pygame.sprite.Group()
+    dungeon = [-300, -300]
 
     all_sprites = pygame.sprite.Group()
     sprite = pygame.sprite.Sprite()
@@ -125,7 +126,6 @@ def startup():
 
     decorations = Decor()
     pickups = Pickup()
-    # mountains_back = [[0 - mountains_back_img.get_width(), 0], [0, 0], [mountains_back_img.get_width(), 0]]
     mountains = [[0 - mountains_img.get_width(), 0], [0, 0], [mountains_img.get_width(), 0]]
 
     world_data = []
@@ -203,6 +203,8 @@ def open_save():
             old_Inventory = data['inventory']
             Rrune = data["runes"]
             Rmana = data["mana"]
+
+
 def menu(display, screen):
 
     pygame.init()
@@ -287,8 +289,8 @@ def menu(display, screen):
         pygame.display.flip()
         clock.tick(60)
 
-def pauses(display):
 
+def pauses(display):
     pygame.init()
     back = pygame.transform.scale(load_image("UI/pause_back.png"), DISPLAY_SIZE)
     play1 = pygame.transform.scale(load_image("UI/play1.png"), (90, 90))
@@ -325,10 +327,12 @@ def pauses(display):
         display.blit(exit1, (exit_rect.x, exit_rect.y))
     return ""
 
+
 if __name__ == '__main__':
+    global kicks, players, decoration_group, enemies, decoration_mobs, abilities_group, all_sprites, \
+            sprite, image, decorations, pickups, world_data, world, player, camera, ui, cur_cutscene, boss
     runnings = True
     while runnings:
-        # save_game()
         screen = pygame.display.set_mode(SCREEN_SIZE, 0, 32)
         display = pygame.Surface(DISPLAY_SIZE, 0, 32)
         pygame.display.set_icon(load_image("UI/logo.png"))
@@ -342,8 +346,7 @@ if __name__ == '__main__':
             save_game(a=True)
             open_save()
         jumper = 0
-        global kicks, players, decoration_group, enemies, decoration_mobs, abilities_group, all_sprites, \
-            sprite, image, decorations, pickups, world_data, world, player, camera, ui, cur_cutscene, boss
+
         pygame.init()
         pygame.display.set_caption('Test')
         font_cutscene = pygame.font.SysFont('Tahoma', 15)
@@ -400,8 +403,13 @@ if __name__ == '__main__':
             decorations.decoration_group.draw(display)
 
             if boss is not None:
-                for bossK in bosses:  # без группы и следования по спрайтам в ней нельзя удалить спрайт, спасибо пайгейм
-                    bossK.draw(display)
+                if boss.alive:
+                    for bossK in bosses:  # без группы и следования по спрайтам в ней нельзя удалить спрайт, спасибо пайгейм
+                        bossK.draw(display)
+                else:
+                    if not final:
+                        isCutscene = True
+                        final = True
 
             abilities_group.draw(display)
             ui.draw_hp(player, display, color_hp)
