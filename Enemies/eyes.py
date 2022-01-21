@@ -56,6 +56,7 @@ class Bullet(pygame.sprite.Sprite):
             speed = random.choice([0.2, 0.6, 1])
             px = random.randint(1, 4)
             partickles_group.add(DustBullet(self.rect,speed, px ))
+        self.dead_sound.set_volume(0.3)
         self.dead_sound.play()
         self.kill()
 
@@ -116,6 +117,7 @@ class Eye(pygame.sprite.Sprite):
         self.player_flip = player.flip
         print(f'Глазику не нравится|{self.hp}')
         if self.hp <= 0:
+            self.dead_sound.set_volume(0.3)
             self.dead_sound.play()
             self.alive = False
             if f:
@@ -216,6 +218,7 @@ class BadEye(pygame.sprite.Sprite):
         self.colvo_bullet += 1
         print(f'ПЛОХОЙ ГЛАЗ ЗЛИТСЯ|{self.hp}')
         if self.hp <= 0:
+            self.dead_sound.set_volume(0.3)
             self.dead_sound.play()
             self.bad_eye = None
             if f:

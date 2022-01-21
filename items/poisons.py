@@ -15,27 +15,31 @@ class Poison(pygame.sprite.Sprite):
             self.image = pygame.transform.scale(load_image(
                 "item/poison_heal.png"), (15, 18)).convert_alpha()
             self.sound_poison = pygame.mixer.Sound("sounds/poison.wav")
+            self.sound_poison.set_volume(0.4)
         elif poison == "regen":
             self.type_poison = "regen"
             self.image = pygame.transform.scale(load_image(
                 "item/poison_regen.png"), (5, 15)).convert_alpha()
             self.sound_poison = pygame.mixer.Sound("sounds/poison.wav")
+            self.sound_poison.set_volume(0.4)
         elif poison == "mana":
             self.type_poison = "mana"
             self.image = pygame.transform.scale(load_image(
                 "item/poison_mana.png"), (15, 18)).convert_alpha()
             self.sound_poison = pygame.mixer.Sound("sounds/poison.wav")
+            self.sound_poison.set_volume(0.4)
         elif poison == "super":
             self.type_poison = "super"
             self.image = pygame.transform.scale(load_image(
                 "item/poison_super.png"), (10, 15)).convert_alpha()
             self.sound_poison = pygame.mixer.Sound("sounds/poison.wav")
+            self.sound_poison.set_volume(0.4)
         elif poison == "secret":
             self.type_poison = "secret"
             self.image = pygame.transform.scale(load_image(
                 "item/Marvin-SHTF.png"), (30, 30)).convert_alpha()
             self.sound_poison = pygame.mixer.Sound("sounds/secret_poison.wav")
-        self.sound_poison.set_volume(0.4)
+            self.sound_poison.set_volume(0.8)
 
         self.rect = self.image.get_rect()
         self.rect.x = x
@@ -110,7 +114,7 @@ class Poison(pygame.sprite.Sprite):
             player.hp = 100
             player.marvin = True
         self.sound_poison.play()
-
-
-
         self.kill()
+
+    def proverka(self, *args):
+        pass

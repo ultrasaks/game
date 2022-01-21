@@ -125,6 +125,7 @@ class Slime(pygame.sprite.Sprite):
         self.player_flip = player.flip
         print(f'Слайм получил урон|{self.hp}')
         if self.hp <= 0:
+            self.dead_sound.set_volume(0.3)
             self.dead_sound.play()
             if f:
                 if player.mana_count < 7:
